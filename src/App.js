@@ -15,7 +15,7 @@ function App() {
     setAdvancedPrompt('');
 
     try {
-      const response = await fetch('https://gerador-prompt-frontend.vercel.app/', {
+      const response = await fetch('https://meu-gerador-backend.onrender.com/generate-prompt', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
