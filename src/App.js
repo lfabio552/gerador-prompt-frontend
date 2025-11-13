@@ -1,4 +1,5 @@
 // frontend/src/App.js
+import VideoSummarizer from './pages/VideoSummarizer';
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import HomePage from './pages/HomePage';
@@ -17,6 +18,7 @@ function App() {
           <Route path="/gerador-imagem" element={<ImagePromptGenerator />} />
           {/* A rota para o VEO 3 será adicionada aqui depois */}
           <Route path="/gerador-veo3" element={<Veo3PromptGenerator />} /> 
+	  <Route path="/resumidor-video" element={<VideoSummarizer />} />
         </Routes>
       </div>
     </Router>
