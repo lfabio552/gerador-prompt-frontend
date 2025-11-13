@@ -16,7 +16,7 @@ export default function VideoSummarizer() {
     try {
       // Lembre-se: Para testar local, use http://localhost:5000
       // Para subir, troque pelo link do Render
-      const response = await fetch('http://localhost:5000/summarize-video', {
+      const response = await fetch('https://meu-gerador-backend.onrender.com', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
