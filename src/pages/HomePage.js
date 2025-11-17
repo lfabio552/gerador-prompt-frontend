@@ -29,12 +29,13 @@ export default function HomePage() {
         </Link>
 
 	{/* Card para o Resumidor de Vídeo */}
-        <Link to="/resumidor-video" className="tool-card">
+        {/* <Link to="/resumidor-video" className="tool-card">
           <div className="tool-card-content">
             <h2>Resumidor de Vídeos</h2>
             <p>Transforme vídeos longos em resumos rápidos e diretos.</p>
           </div>
         </Link>
+      */}
 
         {/* Adicione mais cards aqui no futuro */}
         
