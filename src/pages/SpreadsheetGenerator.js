@@ -13,7 +13,7 @@ export default function SpreadsheetGenerator() {
 
     try {
       // ATENÇÃO: Testando no Localhost. Mudar para o Render no deploy.
-      const response = await fetch('https://meu-gerador-backend.onrender.com', {
+      const response = await fetch('https://meu-gerador-backend.onrender.com/generate-spreadsheet', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
