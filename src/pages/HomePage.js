@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Slider from 'react-slick';
-import { ChevronLeftIcon, ChevronRightIcon, UserCircleIcon } from '@heroicons/react/24/solid';
+import { ChevronLeftIcon, ChevronRightIcon, UserCircleIcon, ArrowRightOnRectangleIcon } from '@heroicons/react/24/solid';
+import { supabase } from '../supabaseClient'; 
 
 // --- SETAS DO CARROSSEL ---
 function SampleNextArrow(props) {
@@ -35,6 +36,35 @@ function SamplePrevArrow(props) {
 }
 
 export default function HomePage() {
+  const [user, setUser] = useState(null);
+  const [credits, setCredits] = useState(null);
+
+  // Busca dados ao carregar
+  useEffect(() => {
+    const getUserData = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+
+      if (user) {
+        // Busca os créditos no banco de dados
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('credits')
+          .eq('id', user.id)
+          .single();
+        
+        if (data) setCredits(data.credits);
+      }
+    };
+    getUserData();
+  }, []);
+
+  // --- FUNÇÃO DE LOGOUT ---
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    window.location.reload(); // Recarrega a página para limpar tudo
+  };
+
   const tools = [
     { id: 1, title: "Gerador de Prompts", description: "Crie prompts detalhados para gerar imagens incríveis em IAs.", imageUrl: "https://placehold.co/600x400/581c87/ffffff?text=Imagem+IA", link: "/gerar-imagem" },
     { id: 2, title: "Formatador ABNT", description: "Cole seu trabalho e baixe o .docx formatado nas normas.", imageUrl: "https://placehold.co/600x400/1e3a8a/ffffff?text=DOCX+ABNT", link: "/agente-abnt" },
@@ -50,15 +80,41 @@ export default function HomePage() {
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#111827', color: 'white', padding: '2rem', position: 'relative', fontFamily: 'sans-serif' }}>
       
-      {/* --- BOTÃO DE LOGIN (CORRIGIDO: Agora tem tamanho fixo) --- */}
-      <div style={{ position: 'absolute', top: '20px', right: '20px', zIndex: 100 }}>
-          <Link to="/login" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none', color: '#d1d5db', backgroundColor: '#1f2937', padding: '10px 20px', borderRadius: '9999px', border: '1px solid #374151' }}>
-              <span style={{ fontWeight: 'bold', fontSize: '14px' }}>Login</span>
-              {/* Tamanho forçado aqui para não ficar gigante */}
-              <UserCircleIcon style={{ width: '24px', height: '24px' }} />
-          </Link>
+      {/* --- CABEÇALHO NOVO (Layout em Coluna) --- */}
+      <div style={{ position: 'absolute', top: '20px', right: '20px', zIndex: 100, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
+          {user ? (
+            <>
+              {/* LINHA 1: Créditos + E-mail + Avatar */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                {/* Créditos */}
+                <div style={{ backgroundColor: '#374151', padding: '6px 12px', borderRadius: '20px', border: '1px solid #7e22ce', color: '#e9d5ff', fontWeight: 'bold', fontSize: '14px' }}>
+                  💎 {credits !== null ? credits : 0}
+                </div>
+                
+                {/* E-mail e Ícone */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#d1d5db' }}>
+                    <span style={{ fontSize: '14px', fontWeight: '500' }}>{user.email}</span>
+                    <UserCircleIcon style={{ width: '36px', height: '36px', color: '#a855f7' }} />
+                </div>
+              </div>
+
+              {/* LINHA 2: Botão Sair (Pequeno e abaixo) */}
+              <button 
+                onClick={handleLogout}
+                style={{ display: 'flex', alignItems: 'center', gap: '4px', backgroundColor: 'transparent', color: '#ef4444', border: '1px solid #ef4444', padding: '4px 10px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '12px', transition: '0.2s' }}
+                onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#ef444433'} // Efeito hover simples
+                onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+              >
+                Sair <ArrowRightOnRectangleIcon style={{ width: '14px', height: '14px' }}/>
+              </button>
+            </>
+          ) : (
+            <Link to="/login" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none', color: '#d1d5db', backgroundColor: '#1f2937', padding: '10px 20px', borderRadius: '9999px', border: '1px solid #374151' }}>
+                <span style={{ fontWeight: 'bold', fontSize: '14px' }}>Login</span>
+                <UserCircleIcon style={{ width: '24px', height: '24px' }} />
+            </Link>
+          )}
       </div>
-      {/* --------------------------------------------------------- */}
 
       <div style={{ position: 'relative', width: '100%', maxWidth: '900px', padding: '40px', marginBottom: '50px', borderRadius: '16px', overflow: 'hidden', marginTop: '40px' }}>
         <div style={{ position: 'absolute', inset: 0, backgroundImage: `url('https://placehold.co/1200x400/111827/3b0764?text=Background+Abstract')`, backgroundSize: 'cover', backgroundPosition: 'center', opacity: 0.6, zIndex: 0 }}></div>
@@ -70,7 +126,6 @@ export default function HomePage() {
       
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 50px' }}> 
         <h3 style={{ fontSize: '1.875rem', fontWeight: 'bold', marginBottom: '20px', borderLeft: '4px solid #a855f7', paddingLeft: '16px' }}>Ferramentas Disponíveis</h3>
-        
         <Slider {...settings}>
           {tools.map((tool) => (
             <div key={tool.id} style={{ padding: '16px' }}>

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import '../App.css'; // Arquivo para estilização
+import '../App.css';
+import { supabase } from '../supabaseClient'; // 1. Importamos o Supabase
 
 export default function ImagePromptGenerator() {
   const [idea, setIdea] = useState('');
@@ -15,20 +16,38 @@ export default function ImagePromptGenerator() {
     setAdvancedPrompt('');
 
     try {
+      // 2. Pegamos o usuário logado
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) throw new Error('Você precisa estar logado.');
+
       const response = await fetch('https://meu-gerador-backend.onrender.com/generate-prompt', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ idea, style }),
+        body: JSON.stringify({ 
+          idea, 
+          style,
+          user_id: user.id // 3. Enviamos o ID junto com o pedido
+        }),
       });
 
-      if (!response.ok) {
-        throw new Error('Falha na comunicação com o servidor.');
+      const data = await response.json();
+
+      // 4. Se o backend disser "Erro 402" (Pagamento), mostramos o erro de crédito
+      if (response.status === 402) {
+        throw new Error(data.error); // "Você não tem créditos suficientes..."
       }
 
-      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'Falha na comunicação com o servidor.');
+      }
+
       setAdvancedPrompt(data.advanced_prompt);
+
+      // (Opcional) Recarrega a página ou atualiza o contador de créditos no cabeçalho
+      // window.location.reload(); // Se quiser atualizar o saldo na hora (bruto, mas funciona)
 
     } catch (err) {
       setError(err.message);
@@ -74,11 +93,11 @@ export default function ImagePromptGenerator() {
         </div>
 
         <button type="submit" disabled={isLoading}>
-          {isLoading ? 'Gerando...' : 'Gerar Prompt Avançado'}
+          {isLoading ? 'Gerando (-1 Crédito)...' : 'Gerar Prompt Avançado'}
         </button>
       </form>
 
-      {error && <div className="error-message">{error}</div>}
+      {error && <div className="error-message" style={{ color: '#ff6b6b', marginTop: '10px' }}>{error}</div>}
 
       {advancedPrompt && (
         <div className="result-container">
@@ -92,4 +111,3 @@ export default function ImagePromptGenerator() {
     </div>
   );
 }
-

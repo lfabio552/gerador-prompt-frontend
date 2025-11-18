@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import '../App.css';
+import { supabase } from '../supabaseClient'; // Importando
 
 export default function SpreadsheetGenerator() {
   const [description, setDescription] = useState('');
@@ -12,24 +13,32 @@ export default function SpreadsheetGenerator() {
     setError('');
 
     try {
-      // ATENÇÃO: Testando no Localhost. Mudar para o Render no deploy.
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Você precisa estar logado.');
+
       const response = await fetch('https://meu-gerador-backend.onrender.com/generate-spreadsheet', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ description }),
+        body: JSON.stringify({ 
+            description,
+            user_id: user.id // Enviando ID
+        }),
       });
+
+      if (response.status === 402) {
+        const errorData = await response.json();
+        throw new Error(errorData.error);
+      }
 
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Erro ao gerar a planilha.');
       }
 
-      // Se deu tudo certo, o backend manda o arquivo
       const blob = await response.blob();
       
-      // Força o download no navegador
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
@@ -59,14 +68,14 @@ export default function SpreadsheetGenerator() {
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
-            placeholder="Ex: Uma planilha de controle de estoque com colunas para Nome do Produto, ID, Quantidade e Preço."
+            placeholder="Ex: Uma planilha de controle de estoque..."
             required
             style={{ minHeight: '150px' }}
           />
         </div>
 
         <button type="submit" disabled={isLoading}>
-          {isLoading ? 'Gerando .xlsx...' : 'Baixar Planilha'}
+          {isLoading ? 'Gerando (-1 Crédito)...' : 'Baixar Planilha'}
         </button>
       </form>
 
