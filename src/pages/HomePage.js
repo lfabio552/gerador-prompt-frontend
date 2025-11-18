@@ -28,14 +28,13 @@ export default function HomePage() {
           </div>
         </Link>
 
-	{/* Card para o Resumidor de Vídeo */}
-        {/* <Link to="/resumidor-video" className="tool-card">
-          <div className="tool-card-content">
-            <h2>Resumidor de Vídeos</h2>
-            <p>Transforme vídeos longos em resumos rápidos e diretos.</p>
-          </div>
-        </Link>
-      */}
+	{/* Card para o Agente ABNT */}
+      <Link to="/agente-abnt" className="tool-card">
+        <div className="tool-card-content">
+          <h2>Formatador ABNT</h2>
+          <p>Formate seu TCC ou trabalho acadêmico em segundos.</p>
+        </div>
+      </Link>
 
         {/* Adicione mais cards aqui no futuro */}
         

@@ -6,6 +6,7 @@ import HomePage from './pages/HomePage';
 import ImagePromptGenerator from './pages/ImagePromptGenerator';
 import Veo3PromptGenerator from './pages/Veo3PromptGenerator';
 import './App.css'; // Estilo global que já temos
+import AgenteABNT from './pages/AgenteABNT';
 
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
           {/* A rota para o VEO 3 será adicionada aqui depois */}
           <Route path="/gerador-veo3" element={<Veo3PromptGenerator />} /> 
 	  <Route path="/resumidor-video" element={<VideoSummarizer />} />
+	  <Route path="/agente-abnt" element={<AgenteABNT />} />
         </Routes>
       </div>
     </Router>
