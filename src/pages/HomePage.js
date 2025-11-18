@@ -36,6 +36,14 @@ export default function HomePage() {
         </div>
       </Link>
 
+	{/* Card para o Gerador de Planilhas */}
+      <Link to="/gerador-planilha" className="tool-card">
+        <div className="tool-card-content">
+          <h2>Gerador de Planilhas</h2>
+          <p>Descreva seu controle e baixe um arquivo Excel (.xlsx) pronto.</p>
+        </div>
+      </Link>
+
         {/* Adicione mais cards aqui no futuro */}
         
       </main>

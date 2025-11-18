@@ -7,6 +7,7 @@ import ImagePromptGenerator from './pages/ImagePromptGenerator';
 import Veo3PromptGenerator from './pages/Veo3PromptGenerator';
 import './App.css'; // Estilo global que já temos
 import AgenteABNT from './pages/AgenteABNT';
+import SpreadsheetGenerator from './pages/SpreadsheetGenerator';
 
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
           <Route path="/gerador-veo3" element={<Veo3PromptGenerator />} /> 
 	  <Route path="/resumidor-video" element={<VideoSummarizer />} />
 	  <Route path="/agente-abnt" element={<AgenteABNT />} />
+	  <Route path="/gerador-planilha" element={<SpreadsheetGenerator />} />
         </Routes>
       </div>
     </Router>
