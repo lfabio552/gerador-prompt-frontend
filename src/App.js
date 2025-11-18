@@ -1,14 +1,17 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Login from './pages/Login';
 
-// --- IMPORTAÇÕES DE CSS (AQUI ESTÁ A CORREÇÃO DAS SETAS) ---
+// --- IMPORTAÇÕES DE CSS ---
 import "slick-carousel/slick/slick.css"; 
 import "slick-carousel/slick/slick-theme.css";
-// -----------------------------------------------------------
 
-// Importando nossas páginas
-import HomePage from './pages/HomePage';
+// --- IMPORTANDO O SEGURANÇA (CATRACA) ---
+import ProtectedRoute from './components/ProtectedRoute'; 
+// (Se der erro aqui, verifique se o arquivo está na pasta components)
+
+// --- IMPORTANDO AS PÁGINAS ---
+import Home from './pages/HomePage';
+import Login from './pages/Login'; // Importando a página de Login
 import ImagePromptGenerator from './pages/ImagePromptGenerator';
 import Veo3PromptGenerator from './pages/Veo3PromptGenerator';
 import VideoSummarizer from './pages/VideoSummarizer';
@@ -22,13 +25,65 @@ function App() {
         
         <main className="flex-grow">
           <Routes>
-            <Route path="/" element={<HomePage />} /> 
-            <Route path="/gerar-imagem" element={<ImagePromptGenerator />} />
-            <Route path="/gerar-veo3-prompt" element={<Veo3PromptGenerator />} />
-            <Route path="/resumir-video" element={<VideoSummarizer />} />
-            <Route path="/agente-abnt" element={<AgenteABNT />} />
-            <Route path="/gerador-planilha" element={<SpreadsheetGenerator />} />
-	    <Route path="/login" element={<Login />} />
+            
+            {/* --- ROTAS PÚBLICAS (Qualquer um pode ver) --- */}
+            <Route path="/" element={<Home />} /> 
+            <Route path="/login" element={<Login />} />
+
+            {/* --- ROTAS PROTEGIDAS (Só quem tem login entra) --- */}
+            
+            <Route 
+              path="/gerar-imagem" 
+              element={
+                <ProtectedRoute>
+                  <ImagePromptGenerator />
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
+              path="/gerar-veo3-prompt" 
+              element={
+                <ProtectedRoute>
+                  <Veo3PromptGenerator />
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
+              path="/resumir-video" 
+              element={
+                <ProtectedRoute>
+                  <VideoSummarizer />
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
+              path="/agente-abnt" 
+              element={
+                <ProtectedRoute>
+                  <AgenteABNT />
+                </ProtectedRoute>
+              } 
+            />
+
+            <Route 
+              path="/gerador-planilha" 
+              element={
+                <ProtectedRoute>
+                  <SpreadsheetGenerator />
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* Rotas de placeholder (ainda vazias) */}
+            <Route path="/chat" element={<div>Página de Chat em breve!</div>} />
+            <Route path="/cursos" element={<div>Página de Cursos em breve!</div>} />
+            <Route path="/newsletters" element={<div>Página de Newsletters em breve!</div>} />
+            <Route path="/chat-com-pesquisa" element={<div>Chat com pesquisa em breve!</div>} />
+            <Route path="/analisar-imagens" element={<div>Analisar imagens em breve!</div>} />
+
           </Routes>
         </main>
 
