@@ -62,7 +62,33 @@ export default function HomePage() {
   // --- FUNÇÃO DE LOGOUT ---
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    window.location.reload(); // Recarrega a página para limpar tudo
+    window.location.reload(); 
+  };
+
+  // --- FUNÇÃO DE ASSINATURA (NOVA) ---
+  const handleSubscribe = async () => {
+    if (!user) return alert("Faça login primeiro!");
+    
+    try {
+      // ATENÇÃO: Estamos usando localhost para testar. Mude para o Render no futuro.
+      const response = await fetch('http://localhost:5000/create-checkout-session', { 
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+            user_id: user.id,
+            email: user.email 
+        }),
+      });
+
+      const data = await response.json();
+      if (data.url) {
+        window.location.href = data.url; // Leva o usuário para o Stripe
+      } else {
+        alert("Erro ao gerar pagamento: " + data.error);
+      }
+    } catch (error) {
+      alert("Erro de conexão: " + error.message);
+    }
   };
 
   const tools = [
@@ -80,12 +106,25 @@ export default function HomePage() {
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#111827', color: 'white', padding: '2rem', position: 'relative', fontFamily: 'sans-serif' }}>
       
-      {/* --- CABEÇALHO NOVO (Layout em Coluna) --- */}
+      {/* --- CABEÇALHO NOVO (Com Botão PRO) --- */}
       <div style={{ position: 'absolute', top: '20px', right: '20px', zIndex: 100, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
           {user ? (
             <>
-              {/* LINHA 1: Créditos + E-mail + Avatar */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                
+                {/* Botão PRO */}
+                <button 
+                  onClick={handleSubscribe}
+                  style={{ 
+                    background: 'linear-gradient(90deg, #fbbf24 0%, #d97706 100%)', // Dourado
+                    border: 'none', padding: '8px 16px', borderRadius: '20px', 
+                    color: '#fff', fontWeight: 'bold', fontSize: '14px', cursor: 'pointer',
+                    boxShadow: '0 0 10px rgba(251, 191, 36, 0.5)'
+                  }}
+                >
+                  👑 Virar PRO
+                </button>
+
                 {/* Créditos */}
                 <div style={{ backgroundColor: '#374151', padding: '6px 12px', borderRadius: '20px', border: '1px solid #7e22ce', color: '#e9d5ff', fontWeight: 'bold', fontSize: '14px' }}>
                   💎 {credits !== null ? credits : 0}
@@ -98,11 +137,11 @@ export default function HomePage() {
                 </div>
               </div>
 
-              {/* LINHA 2: Botão Sair (Pequeno e abaixo) */}
+              {/* Botão Sair */}
               <button 
                 onClick={handleLogout}
                 style={{ display: 'flex', alignItems: 'center', gap: '4px', backgroundColor: 'transparent', color: '#ef4444', border: '1px solid #ef4444', padding: '4px 10px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '12px', transition: '0.2s' }}
-                onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#ef444433'} // Efeito hover simples
+                onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#ef444433'}
                 onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
               >
                 Sair <ArrowRightOnRectangleIcon style={{ width: '14px', height: '14px' }}/>
