@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { supabase } from '../supabaseClient';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom'; // Adicionei o Link aqui
 
 export default function Login() {
   const [loading, setLoading] = useState(false);
@@ -18,13 +18,15 @@ export default function Login() {
     try {
       let error;
       if (isSignUp) {
+        // Criar Conta
         const { error: signUpError } = await supabase.auth.signUp({ email, password });
         error = signUpError;
         if (!error) setMessage('Verifique seu e-mail para confirmar o cadastro!');
       } else {
+        // Fazer Login
         const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
         error = signInError;
-        if (!error) navigate('/');
+        if (!error) navigate('/'); // Vai para a Home
       }
       if (error) throw error;
     } catch (error) {
@@ -34,19 +36,19 @@ export default function Login() {
     }
   };
 
-  // Estilos em Objetos (para garantir que funcione sem Tailwind)
+  // Estilos
   const styles = {
     container: {
       minHeight: '100vh',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      backgroundColor: '#111827', // Fundo escuro
+      backgroundColor: '#111827',
       color: 'white',
       fontFamily: 'sans-serif'
     },
     card: {
-      backgroundColor: '#1f2937', // Cinza mais claro
+      backgroundColor: '#1f2937',
       padding: '40px',
       borderRadius: '16px',
       boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
@@ -57,12 +59,12 @@ export default function Login() {
     title: {
       fontSize: '2rem',
       fontWeight: 'bold',
-      color: '#a855f7', // Roxo
+      color: '#a855f7',
       marginBottom: '20px',
       textAlign: 'center'
     },
     input: {
-      width: '92%', // Ajuste para o padding
+      width: '92%',
       padding: '12px',
       marginBottom: '15px',
       borderRadius: '8px',
@@ -74,7 +76,7 @@ export default function Login() {
     button: {
       width: '100%',
       padding: '12px',
-      backgroundColor: '#7e22ce', // Roxo
+      backgroundColor: '#7e22ce',
       color: 'white',
       border: 'none',
       borderRadius: '8px',
@@ -106,6 +108,14 @@ export default function Login() {
       fontWeight: 'bold',
       cursor: 'pointer',
       marginLeft: '5px'
+    },
+    forgotLink: {
+      display: 'block',
+      textAlign: 'right',
+      marginTop: '10px',
+      color: '#9ca3af',
+      fontSize: '13px',
+      textDecoration: 'none'
     }
   };
 
@@ -138,6 +148,13 @@ export default function Login() {
             {loading ? 'Carregando...' : (isSignUp ? 'Cadastrar' : 'Entrar')}
           </button>
         </form>
+
+        {/* LINK ESQUICI MINHA SENHA (SÓ MOSTRA NO LOGIN) */}
+        {!isSignUp && (
+          <Link to="/forgot-password" style={styles.forgotLink}>
+            Esqueci minha senha
+          </Link>
+        )}
 
         {message && <div style={styles.message}>{message}</div>}
 

@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
+
 // --- IMPORTAÇÕES DE CSS ---
 import "slick-carousel/slick/slick.css"; 
 import "slick-carousel/slick/slick-theme.css";
@@ -17,6 +18,8 @@ import Veo3PromptGenerator from './pages/Veo3PromptGenerator';
 import VideoSummarizer from './pages/VideoSummarizer';
 import AgenteABNT from './pages/AgenteABNT';
 import SpreadsheetGenerator from './pages/SpreadsheetGenerator';
+import ForgotPassword from './pages/ForgotPassword';
+import UpdatePassword from './pages/UpdatePassword';
 
 function App() {
   return (
@@ -29,6 +32,9 @@ function App() {
             {/* --- ROTAS PÚBLICAS (Qualquer um pode ver) --- */}
             <Route path="/" element={<Home />} /> 
             <Route path="/login" element={<Login />} />
+
+	    <Route path="/forgot-password" element={<ForgotPassword />} />
+	    <Route path="/update-password" element={<UpdatePassword />} />
 
             {/* --- ROTAS PROTEGIDAS (Só quem tem login entra) --- */}
             
