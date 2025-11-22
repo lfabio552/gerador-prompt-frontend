@@ -66,7 +66,7 @@ export default function HomePage() {
     if (!user) return alert("Faça login primeiro!");
     try {
       // Link de Produção (Render)
-      const response = await fetch('[https://meu-gerador-backend.onrender.com/create-checkout-session](https://meu-gerador-backend.onrender.com/create-checkout-session)', { 
+      const response = await fetch('https://meu-gerador-backend.onrender.com/create-checkout-session', { 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: user.id, email: user.email }),
@@ -79,7 +79,7 @@ export default function HomePage() {
 
   const handlePortal = async () => {
     try {
-      const response = await fetch('[https://meu-gerador-backend.onrender.com/create-portal-session](https://meu-gerador-backend.onrender.com/create-portal-session)', { 
+      const response = await fetch('https://meu-gerador-backend.onrender.com/create-portal-session', { 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: user.id }),
@@ -95,49 +95,49 @@ export default function HomePage() {
       id: 1, 
       title: "Gerador de Prompts", 
       description: "Crie prompts detalhados para gerar imagens incríveis em IAs.", 
-      imageUrl: "[https://placehold.co/600x400/581c87/ffffff?text=Imagem+IA](https://placehold.co/600x400/581c87/ffffff?text=Imagem+IA)", 
+      imageUrl: "https://placehold.co/600x400/581c87/ffffff?text=Imagem+IA", 
       link: "/gerar-imagem" 
     },
     { 
       id: 2, 
       title: "Formatador ABNT", 
       description: "Cole seu trabalho e baixe o .docx formatado nas normas.", 
-      imageUrl: "[https://placehold.co/600x400/1e3a8a/ffffff?text=DOCX+ABNT](https://placehold.co/600x400/1e3a8a/ffffff?text=DOCX+ABNT)", 
+      imageUrl: "https://placehold.co/600x400/1e3a8a/ffffff?text=DOCX+ABNT", 
       link: "/agente-abnt" 
     },
     { 
       id: 3, 
       title: "Gerador de Planilhas", 
       description: "Descreva sua planilha e a IA cria o arquivo .xlsx pronto.", 
-      imageUrl: "[https://placehold.co/600x400/064e3b/ffffff?text=Excel+IA](https://placehold.co/600x400/064e3b/ffffff?text=Excel+IA)", 
+      imageUrl: "https://placehold.co/600x400/064e3b/ffffff?text=Excel+IA", 
       link: "/gerador-planilha" 
     },
     { 
       id: 4, 
       title: "Gerador VEO 3", 
       description: "Crie prompts técnicos para geração de vídeo.", 
-      imageUrl: "[https://placehold.co/600x400/374151/ffffff?text=Video+Prompt](https://placehold.co/600x400/374151/ffffff?text=Video+Prompt)", 
+      imageUrl: "https://placehold.co/600x400/374151/ffffff?text=Video+Prompt", 
       link: "/gerar-veo3-prompt" 
     },
     { 
       id: 5, 
       title: "Chat com PDF (RAG)", 
       description: "Faça upload de um documento PDF e converse com ele.", 
-      imageUrl: "[https://placehold.co/600x400/be185d/ffffff?text=Chat+PDF](https://placehold.co/600x400/be185d/ffffff?text=Chat+PDF)", 
+      imageUrl: "https://placehold.co/600x400/be185d/ffffff?text=Chat+PDF", 
       link: "/chat-pdf" 
     },
     { 
       id: 6, 
       title: "Tradutor Corporativo", 
       description: "Transforme textos informais ou irritados em e-mails executivos polidos.", 
-      imageUrl: "[https://placehold.co/600x400/2563eb/ffffff?text=Email+Pro](https://placehold.co/600x400/2563eb/ffffff?text=Email+Pro)", 
+      imageUrl: "https://placehold.co/600x400/2563eb/ffffff?text=Email+Pro", 
       link: "/tradutor-corporativo" 
     },
     { 
       id: 7, 
       title: "Social Media Kit", 
       description: "Gera posts para Instagram, LinkedIn e Twitter automaticamente.", 
-      imageUrl: "[https://placehold.co/600x400/db2777/ffffff?text=Social+Media](https://placehold.co/600x400/db2777/ffffff?text=Social+Media)", 
+      imageUrl: "https://placehold.co/600x400/db2777/ffffff?text=Social+Media", 
       link: "/social-media" 
     }
   ];
