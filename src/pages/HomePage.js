@@ -65,6 +65,7 @@ export default function HomePage() {
   const handleSubscribe = async () => {
     if (!user) return alert("Faça login primeiro!");
     try {
+      // Link de Produção (Render)
       const response = await fetch('[https://meu-gerador-backend.onrender.com/create-checkout-session](https://meu-gerador-backend.onrender.com/create-checkout-session)', { 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -131,6 +132,13 @@ export default function HomePage() {
       description: "Transforme textos informais ou irritados em e-mails executivos polidos.", 
       imageUrl: "[https://placehold.co/600x400/2563eb/ffffff?text=Email+Pro](https://placehold.co/600x400/2563eb/ffffff?text=Email+Pro)", 
       link: "/tradutor-corporativo" 
+    },
+    { 
+      id: 7, 
+      title: "Social Media Kit", 
+      description: "Gera posts para Instagram, LinkedIn e Twitter automaticamente.", 
+      imageUrl: "[https://placehold.co/600x400/db2777/ffffff?text=Social+Media](https://placehold.co/600x400/db2777/ffffff?text=Social+Media)", 
+      link: "/social-media" 
     }
   ];
   

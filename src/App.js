@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 // --- IMPORTAÇÕES DE CSS ---
+// Certifique-se de que instalou: npm install slick-carousel react-slick
 import "slick-carousel/slick/slick.css"; 
 import "slick-carousel/slick/slick-theme.css";
 
@@ -21,7 +22,8 @@ import VideoSummarizer from './pages/VideoSummarizer';
 import AgenteABNT from './pages/AgenteABNT';
 import SpreadsheetGenerator from './pages/SpreadsheetGenerator';
 import ChatPDF from './pages/ChatPDF';
-import CorporateTranslator from './pages/CorporateTranslator'; // <--- NOVA IMPORTAÇÃO
+import CorporateTranslator from './pages/CorporateTranslator'; 
+import SocialMediaGenerator from './pages/SocialMediaGenerator';
 
 function App() {
   return (
@@ -69,10 +71,15 @@ function App() {
               element={<ProtectedRoute><ChatPDF /></ProtectedRoute>} 
             />
 
-            {/* NOVA ROTA DO TRADUTOR */}
             <Route 
               path="/tradutor-corporativo" 
               element={<ProtectedRoute><CorporateTranslator /></ProtectedRoute>} 
+            />
+
+            {/* NOVA ROTA DE SOCIAL MEDIA */}
+            <Route 
+              path="/social-media" 
+              element={<ProtectedRoute><SocialMediaGenerator /></ProtectedRoute>} 
             />
             
             {/* Rotas de placeholder */}
