@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Slider from 'react-slick';
-import { ChevronLeftIcon, ChevronRightIcon, UserCircleIcon, ArrowRightOnRectangleIcon } from '@heroicons/react/24/solid';
+import { ChevronLeftIcon, ChevronRightIcon, UserCircleIcon, ArrowRightOnRectangleIcon, Cog6ToothIcon } from '@heroicons/react/24/solid'; // Importei ícone de engrenagem
 import { supabase } from '../supabaseClient'; 
 
 // --- SETAS DO CARROSSEL ---
@@ -10,9 +10,7 @@ function SampleNextArrow(props) {
   return (
     <div
       className={className}
-      style={{ 
-        ...style, display: "flex", background: "#7e22ce", borderRadius: '50%', width: '50px', height: '50px', right: '-25px', justifyContent: 'center', alignItems: 'center', zIndex: 50, boxShadow: '0 4px 6px rgba(0,0,0,0.3)', cursor: 'pointer'
-      }}
+      style={{ ...style, display: "flex", background: "#7e22ce", borderRadius: '50%', width: '50px', height: '50px', right: '-25px', justifyContent: 'center', alignItems: 'center', zIndex: 50, boxShadow: '0 4px 6px rgba(0,0,0,0.3)', cursor: 'pointer' }}
       onClick={onClick}
     >
       <ChevronRightIcon style={{ width: '30px', height: '30px', color: 'white' }} />
@@ -25,9 +23,7 @@ function SamplePrevArrow(props) {
   return (
     <div
       className={className}
-      style={{ 
-        ...style, display: "flex", background: "#7e22ce", borderRadius: '50%', width: '50px', height: '50px', left: '-25px', justifyContent: 'center', alignItems: 'center', zIndex: 50, boxShadow: '0 4px 6px rgba(0,0,0,0.3)', cursor: 'pointer'
-      }}
+      style={{ ...style, display: "flex", background: "#7e22ce", borderRadius: '50%', width: '50px', height: '50px', left: '-25px', justifyContent: 'center', alignItems: 'center', zIndex: 50, boxShadow: '0 4px 6px rgba(0,0,0,0.3)', cursor: 'pointer' }}
       onClick={onClick}
     >
       <ChevronLeftIcon style={{ width: '30px', height: '30px', color: 'white' }} />
@@ -38,25 +34,24 @@ function SamplePrevArrow(props) {
 export default function HomePage() {
   const [user, setUser] = useState(null);
   const [credits, setCredits] = useState(null);
-  const [isPro, setIsPro] = useState(false); // Novo estado para saber se é VIP
+  const [isPro, setIsPro] = useState(false);
 
-  // Busca dados ao carregar
+  // Busca dados
   useEffect(() => {
     const getUserData = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
 
       if (user) {
-        // Busca créditos E status PRO
-        const { data, error } = await supabase
+        const { data } = await supabase
           .from('profiles')
-          .select('credits, is_pro') // Pede a coluna is_pro também
+          .select('credits, is_pro')
           .eq('id', user.id)
           .single();
         
         if (data) {
             setCredits(data.credits);
-            setIsPro(data.is_pro); // Salva se é PRO ou não
+            setIsPro(data.is_pro);
         }
       }
     };
@@ -68,28 +63,34 @@ export default function HomePage() {
     window.location.reload(); 
   };
 
+  // --- FUNÇÃO DE ASSINATURA (VIRAR PRO) ---
   const handleSubscribe = async () => {
     if (!user) return alert("Faça login primeiro!");
     try {
-      // Link de produção da Render
+      // Mudar para Render no Deploy
       const response = await fetch('https://meu-gerador-backend.onrender.com/create-checkout-session', { 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-            user_id: user.id,
-            email: user.email 
-        }),
+        body: JSON.stringify({ user_id: user.id, email: user.email }),
       });
-
       const data = await response.json();
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        alert("Erro ao gerar pagamento: " + data.error);
-      }
-    } catch (error) {
-      alert("Erro de conexão: " + error.message);
-    }
+      if (data.url) window.location.href = data.url;
+      else alert("Erro: " + data.error);
+    } catch (error) { alert("Erro: " + error.message); }
+  };
+
+  // --- FUNÇÃO DE GERENCIAR (CANCELAR/FATURAS) ---
+  const handlePortal = async () => {
+    try {
+      const response = await fetch('https://meu-gerador-backend.onrender.com/create-portal-session', { 
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id: user.id }),
+      });
+      const data = await response.json();
+      if (data.url) window.location.href = data.url; // Vai para o portal do Stripe
+      else alert("Erro: " + data.error);
+    } catch (error) { alert("Erro: " + error.message); }
   };
 
   const tools = [
@@ -107,35 +108,31 @@ export default function HomePage() {
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#111827', color: 'white', padding: '2rem', position: 'relative', fontFamily: 'sans-serif' }}>
       
-      {/* --- CABEÇALHO INTELIGENTE --- */}
+      {/* --- CABEÇALHO --- */}
       <div style={{ position: 'absolute', top: '20px', right: '20px', zIndex: 100, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
           {user ? (
             <>
               <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
                 
-                {/* Botão PRO: Só mostra se NÃO for PRO */}
-                {!isPro && (
+                {/* BOTÃO DINÂMICO: Se não é Pro (Virar PRO) | Se é Pro (Gerenciar) */}
+                {!isPro ? (
                     <button 
                     onClick={handleSubscribe}
-                    style={{ 
-                        background: 'linear-gradient(90deg, #fbbf24 0%, #d97706 100%)', 
-                        border: 'none', padding: '8px 16px', borderRadius: '20px', 
-                        color: '#fff', fontWeight: 'bold', fontSize: '14px', cursor: 'pointer',
-                        boxShadow: '0 0 10px rgba(251, 191, 36, 0.5)'
-                    }}
+                    style={{ background: 'linear-gradient(90deg, #fbbf24 0%, #d97706 100%)', border: 'none', padding: '8px 16px', borderRadius: '20px', color: '#fff', fontWeight: 'bold', fontSize: '14px', cursor: 'pointer', boxShadow: '0 0 10px rgba(251, 191, 36, 0.5)' }}
                     >
                     👑 Virar PRO
                     </button>
+                ) : (
+                    <button 
+                    onClick={handlePortal}
+                    style={{ background: '#374151', border: '1px solid #6b7280', padding: '8px 16px', borderRadius: '20px', color: '#d1d5db', fontWeight: 'bold', fontSize: '14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}
+                    >
+                    <Cog6ToothIcon style={{ width: '16px', height: '16px' }}/> Minha Assinatura
+                    </button>
                 )}
 
-                {/* Créditos: Muda o visual se for PRO */}
-                <div style={{ 
-                    backgroundColor: isPro ? '#581c87' : '#374151', // Roxo se PRO, Cinza se Free
-                    padding: '6px 12px', borderRadius: '20px', 
-                    border: isPro ? '1px solid #d8b4fe' : '1px solid #7e22ce', 
-                    color: isPro ? '#fff' : '#e9d5ff', 
-                    fontWeight: 'bold', fontSize: '14px' 
-                }}>
+                {/* Créditos */}
+                <div style={{ backgroundColor: isPro ? '#581c87' : '#374151', padding: '6px 12px', borderRadius: '20px', border: isPro ? '1px solid #d8b4fe' : '1px solid #7e22ce', color: isPro ? '#fff' : '#e9d5ff', fontWeight: 'bold', fontSize: '14px' }}>
                   💎 {isPro ? "PRO ILIMITADO" : (credits !== null ? credits : 0)}
                 </div>
                 
