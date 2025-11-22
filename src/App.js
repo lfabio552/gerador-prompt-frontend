@@ -2,9 +2,11 @@ import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 // --- IMPORTAÇÕES DE CSS ---
-// Certifique-se de que instalou: npm install slick-carousel react-slick
-import "slick-carousel/slick/slick.css"; 
-import "slick-carousel/slick/slick-theme.css";
+// Em ambientes locais, você precisaria instalar: npm install slick-carousel react-slick
+// Para este ambiente, vamos comentar para evitar erros de build se as libs não estiverem presentes.
+// Se você estiver rodando localmente e tiver instalado, pode descomentar.
+// import "slick-carousel/slick/slick.css"; 
+// import "slick-carousel/slick/slick-theme.css";
 
 // --- IMPORTANDO O SEGURANÇA (CATRACA) ---
 import ProtectedRoute from './components/ProtectedRoute'; 
