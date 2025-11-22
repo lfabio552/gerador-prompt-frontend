@@ -20,6 +20,7 @@ import AgenteABNT from './pages/AgenteABNT';
 import SpreadsheetGenerator from './pages/SpreadsheetGenerator';
 import ForgotPassword from './pages/ForgotPassword';
 import UpdatePassword from './pages/UpdatePassword';
+import ChatPDF from './pages/ChatPDF';
 
 function App() {
   return (
@@ -37,6 +38,15 @@ function App() {
 	    <Route path="/update-password" element={<UpdatePassword />} />
 
             {/* --- ROTAS PROTEGIDAS (Só quem tem login entra) --- */}
+
+	   <Route 
+  	    path="/chat-pdf" 
+  	    element={
+	    <ProtectedRoute>
+	 	<ChatPDF />
+	    </ProtectedRoute>
+	    } 
+	   />
             
             <Route 
               path="/gerar-imagem" 

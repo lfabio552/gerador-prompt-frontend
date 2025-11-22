@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Slider from 'react-slick';
-import { ChevronLeftIcon, ChevronRightIcon, UserCircleIcon, ArrowRightOnRectangleIcon, Cog6ToothIcon } from '@heroicons/react/24/solid'; // Importei ícone de engrenagem
+import { ChevronLeftIcon, ChevronRightIcon, UserCircleIcon, ArrowRightOnRectangleIcon, Cog6ToothIcon } from '@heroicons/react/24/solid';
 import { supabase } from '../supabaseClient'; 
 
 // --- SETAS DO CARROSSEL ---
@@ -88,16 +88,47 @@ export default function HomePage() {
         body: JSON.stringify({ user_id: user.id }),
       });
       const data = await response.json();
-      if (data.url) window.location.href = data.url; // Vai para o portal do Stripe
+      if (data.url) window.location.href = data.url; 
       else alert("Erro: " + data.error);
     } catch (error) { alert("Erro: " + error.message); }
   };
 
   const tools = [
-    { id: 1, title: "Gerador de Prompts", description: "Crie prompts detalhados para gerar imagens incríveis em IAs.", imageUrl: "https://placehold.co/600x400/581c87/ffffff?text=Imagem+IA", link: "/gerar-imagem" },
-    { id: 2, title: "Formatador ABNT", description: "Cole seu trabalho e baixe o .docx formatado nas normas.", imageUrl: "https://placehold.co/600x400/1e3a8a/ffffff?text=DOCX+ABNT", link: "/agente-abnt" },
-    { id: 3, title: "Gerador de Planilhas", description: "Descreva sua planilha e a IA cria o arquivo .xlsx pronto.", imageUrl: "https://placehold.co/600x400/064e3b/ffffff?text=Excel+IA", link: "/gerador-planilha" },
-    { id: 4, title: "Gerador VEO 3", description: "Crie prompts técnicos para geração de vídeo.", imageUrl: "https://placehold.co/600x400/374151/ffffff?text=Video+Prompt", link: "/gerar-veo3-prompt" }
+    { 
+      id: 1, 
+      title: "Gerador de Prompts", 
+      description: "Crie prompts detalhados para gerar imagens incríveis em IAs.", 
+      imageUrl: "https://placehold.co/600x400/581c87/ffffff?text=Imagem+IA", 
+      link: "/gerar-imagem" 
+    },
+    { 
+      id: 2, 
+      title: "Formatador ABNT", 
+      description: "Cole seu trabalho e baixe o .docx formatado nas normas.", 
+      imageUrl: "https://placehold.co/600x400/1e3a8a/ffffff?text=DOCX+ABNT", 
+      link: "/agente-abnt" 
+    },
+    { 
+      id: 3, 
+      title: "Gerador de Planilhas", 
+      description: "Descreva sua planilha e a IA cria o arquivo .xlsx pronto.", 
+      imageUrl: "https://placehold.co/600x400/064e3b/ffffff?text=Excel+IA", 
+      link: "/gerador-planilha" 
+    },
+    { 
+      id: 4, 
+      title: "Gerador VEO 3", 
+      description: "Crie prompts técnicos para geração de vídeo.", 
+      imageUrl: "https://placehold.co/600x400/374151/ffffff?text=Video+Prompt", 
+      link: "/gerar-veo3-prompt" 
+    },
+    { 
+      id: 5, 
+      title: "Chat com PDF (RAG)", 
+      description: "Faça upload de um documento PDF e converse com ele.", 
+      imageUrl: "https://placehold.co/600x400/be185d/ffffff?text=Chat+PDF", 
+      link: "/chat-pdf" 
+    }
   ];
   
   const settings = {
@@ -114,7 +145,6 @@ export default function HomePage() {
             <>
               <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
                 
-                {/* BOTÃO DINÂMICO: Se não é Pro (Virar PRO) | Se é Pro (Gerenciar) */}
                 {!isPro ? (
                     <button 
                     onClick={handleSubscribe}
@@ -131,7 +161,6 @@ export default function HomePage() {
                     </button>
                 )}
 
-                {/* Créditos */}
                 <div style={{ backgroundColor: isPro ? '#581c87' : '#374151', padding: '6px 12px', borderRadius: '20px', border: isPro ? '1px solid #d8b4fe' : '1px solid #7e22ce', color: isPro ? '#fff' : '#e9d5ff', fontWeight: 'bold', fontSize: '14px' }}>
                   💎 {isPro ? "PRO ILIMITADO" : (credits !== null ? credits : 0)}
                 </div>
