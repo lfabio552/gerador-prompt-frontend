@@ -36,7 +36,6 @@ export default function HomePage() {
   const [credits, setCredits] = useState(null);
   const [isPro, setIsPro] = useState(false);
 
-  // Busca dados
   useEffect(() => {
     const getUserData = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -63,11 +62,9 @@ export default function HomePage() {
     window.location.reload(); 
   };
 
-  // --- FUNÇÃO DE ASSINATURA (VIRAR PRO) ---
   const handleSubscribe = async () => {
     if (!user) return alert("Faça login primeiro!");
     try {
-      // Mudar para Render no Deploy
       const response = await fetch('https://meu-gerador-backend.onrender.com/create-checkout-session', { 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -79,7 +76,6 @@ export default function HomePage() {
     } catch (error) { alert("Erro: " + error.message); }
   };
 
-  // --- FUNÇÃO DE GERENCIAR (CANCELAR/FATURAS) ---
   const handlePortal = async () => {
     try {
       const response = await fetch('https://meu-gerador-backend.onrender.com/create-portal-session', { 
@@ -128,6 +124,13 @@ export default function HomePage() {
       description: "Faça upload de um documento PDF e converse com ele.", 
       imageUrl: "https://placehold.co/600x400/be185d/ffffff?text=Chat+PDF", 
       link: "/chat-pdf" 
+    },
+    { 
+      id: 6, 
+      title: "Tradutor Corporativo", 
+      description: "Transforme textos informais ou irritados em e-mails executivos polidos.", 
+      imageUrl: "https://placehold.co/600x400/2563eb/ffffff?text=Email+Pro", 
+      link: "/tradutor-corporativo" 
     }
   ];
   
@@ -139,44 +142,28 @@ export default function HomePage() {
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#111827', color: 'white', padding: '2rem', position: 'relative', fontFamily: 'sans-serif' }}>
       
-      {/* --- CABEÇALHO --- */}
       <div style={{ position: 'absolute', top: '20px', right: '20px', zIndex: 100, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '8px' }}>
           {user ? (
             <>
               <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                
                 {!isPro ? (
-                    <button 
-                    onClick={handleSubscribe}
-                    style={{ background: 'linear-gradient(90deg, #fbbf24 0%, #d97706 100%)', border: 'none', padding: '8px 16px', borderRadius: '20px', color: '#fff', fontWeight: 'bold', fontSize: '14px', cursor: 'pointer', boxShadow: '0 0 10px rgba(251, 191, 36, 0.5)' }}
-                    >
+                    <button onClick={handleSubscribe} style={{ background: 'linear-gradient(90deg, #fbbf24 0%, #d97706 100%)', border: 'none', padding: '8px 16px', borderRadius: '20px', color: '#fff', fontWeight: 'bold', fontSize: '14px', cursor: 'pointer', boxShadow: '0 0 10px rgba(251, 191, 36, 0.5)' }}>
                     👑 Virar PRO
                     </button>
                 ) : (
-                    <button 
-                    onClick={handlePortal}
-                    style={{ background: '#374151', border: '1px solid #6b7280', padding: '8px 16px', borderRadius: '20px', color: '#d1d5db', fontWeight: 'bold', fontSize: '14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}
-                    >
+                    <button onClick={handlePortal} style={{ background: '#374151', border: '1px solid #6b7280', padding: '8px 16px', borderRadius: '20px', color: '#d1d5db', fontWeight: 'bold', fontSize: '14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}>
                     <Cog6ToothIcon style={{ width: '16px', height: '16px' }}/> Minha Assinatura
                     </button>
                 )}
-
                 <div style={{ backgroundColor: isPro ? '#581c87' : '#374151', padding: '6px 12px', borderRadius: '20px', border: isPro ? '1px solid #d8b4fe' : '1px solid #7e22ce', color: isPro ? '#fff' : '#e9d5ff', fontWeight: 'bold', fontSize: '14px' }}>
                   💎 {isPro ? "PRO ILIMITADO" : (credits !== null ? credits : 0)}
                 </div>
-                
                 <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#d1d5db' }}>
                     <span style={{ fontSize: '14px', fontWeight: '500' }}>{user.email}</span>
                     <UserCircleIcon style={{ width: '36px', height: '36px', color: '#a855f7' }} />
                 </div>
               </div>
-
-              <button 
-                onClick={handleLogout}
-                style={{ display: 'flex', alignItems: 'center', gap: '4px', backgroundColor: 'transparent', color: '#ef4444', border: '1px solid #ef4444', padding: '4px 10px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '12px', transition: '0.2s' }}
-                onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#ef444433'}
-                onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-              >
+              <button onClick={handleLogout} style={{ display: 'flex', alignItems: 'center', gap: '4px', backgroundColor: 'transparent', color: '#ef4444', border: '1px solid #ef4444', padding: '4px 10px', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '12px', transition: '0.2s' }} onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#ef444433'} onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}>
                 Sair <ArrowRightOnRectangleIcon style={{ width: '14px', height: '14px' }}/>
               </button>
             </>
@@ -198,7 +185,7 @@ export default function HomePage() {
       
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 50px' }}> 
         <h3 style={{ fontSize: '1.875rem', fontWeight: 'bold', marginBottom: '20px', borderLeft: '4px solid #a855f7', paddingLeft: '16px' }}>Ferramentas Disponíveis</h3>
-        <Slider {...settings}>
+        <Slider {...settings} className="pb-10">
           {tools.map((tool) => (
             <div key={tool.id} style={{ padding: '16px' }}>
               <div style={{ backgroundColor: '#1f2937', borderRadius: '16px', overflow: 'hidden', height: '100%', display: 'flex', flexDirection: 'column', border: '1px solid #374151', margin: '0 10px' }}>

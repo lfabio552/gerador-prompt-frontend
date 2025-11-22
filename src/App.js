@@ -1,26 +1,27 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
-
 // --- IMPORTAÇÕES DE CSS ---
 import "slick-carousel/slick/slick.css"; 
 import "slick-carousel/slick/slick-theme.css";
 
 // --- IMPORTANDO O SEGURANÇA (CATRACA) ---
 import ProtectedRoute from './components/ProtectedRoute'; 
-// (Se der erro aqui, verifique se o arquivo está na pasta components)
 
 // --- IMPORTANDO AS PÁGINAS ---
 import Home from './pages/HomePage';
-import Login from './pages/Login'; // Importando a página de Login
+import Login from './pages/Login';
+import ForgotPassword from './pages/ForgotPassword';
+import UpdatePassword from './pages/UpdatePassword';
+
+// Ferramentas
 import ImagePromptGenerator from './pages/ImagePromptGenerator';
 import Veo3PromptGenerator from './pages/Veo3PromptGenerator';
 import VideoSummarizer from './pages/VideoSummarizer';
 import AgenteABNT from './pages/AgenteABNT';
 import SpreadsheetGenerator from './pages/SpreadsheetGenerator';
-import ForgotPassword from './pages/ForgotPassword';
-import UpdatePassword from './pages/UpdatePassword';
 import ChatPDF from './pages/ChatPDF';
+import CorporateTranslator from './pages/CorporateTranslator'; // <--- NOVA IMPORTAÇÃO
 
 function App() {
   return (
@@ -30,70 +31,51 @@ function App() {
         <main className="flex-grow">
           <Routes>
             
-            {/* --- ROTAS PÚBLICAS (Qualquer um pode ver) --- */}
+            {/* --- ROTAS PÚBLICAS --- */}
             <Route path="/" element={<Home />} /> 
             <Route path="/login" element={<Login />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/update-password" element={<UpdatePassword />} />
 
-	    <Route path="/forgot-password" element={<ForgotPassword />} />
-	    <Route path="/update-password" element={<UpdatePassword />} />
-
-            {/* --- ROTAS PROTEGIDAS (Só quem tem login entra) --- */}
-
-	   <Route 
-  	    path="/chat-pdf" 
-  	    element={
-	    <ProtectedRoute>
-	 	<ChatPDF />
-	    </ProtectedRoute>
-	    } 
-	   />
+            {/* --- ROTAS PROTEGIDAS (Ferramentas) --- */}
             
             <Route 
               path="/gerar-imagem" 
-              element={
-                <ProtectedRoute>
-                  <ImagePromptGenerator />
-                </ProtectedRoute>
-              } 
+              element={<ProtectedRoute><ImagePromptGenerator /></ProtectedRoute>} 
             />
 
             <Route 
               path="/gerar-veo3-prompt" 
-              element={
-                <ProtectedRoute>
-                  <Veo3PromptGenerator />
-                </ProtectedRoute>
-              } 
+              element={<ProtectedRoute><Veo3PromptGenerator /></ProtectedRoute>} 
             />
 
             <Route 
               path="/resumir-video" 
-              element={
-                <ProtectedRoute>
-                  <VideoSummarizer />
-                </ProtectedRoute>
-              } 
+              element={<ProtectedRoute><VideoSummarizer /></ProtectedRoute>} 
             />
 
             <Route 
               path="/agente-abnt" 
-              element={
-                <ProtectedRoute>
-                  <AgenteABNT />
-                </ProtectedRoute>
-              } 
+              element={<ProtectedRoute><AgenteABNT /></ProtectedRoute>} 
             />
 
             <Route 
               path="/gerador-planilha" 
-              element={
-                <ProtectedRoute>
-                  <SpreadsheetGenerator />
-                </ProtectedRoute>
-              } 
+              element={<ProtectedRoute><SpreadsheetGenerator /></ProtectedRoute>} 
+            />
+
+            <Route 
+              path="/chat-pdf" 
+              element={<ProtectedRoute><ChatPDF /></ProtectedRoute>} 
+            />
+
+            {/* NOVA ROTA DO TRADUTOR */}
+            <Route 
+              path="/tradutor-corporativo" 
+              element={<ProtectedRoute><CorporateTranslator /></ProtectedRoute>} 
             />
             
-            {/* Rotas de placeholder (ainda vazias) */}
+            {/* Rotas de placeholder */}
             <Route path="/chat" element={<div>Página de Chat em breve!</div>} />
             <Route path="/cursos" element={<div>Página de Cursos em breve!</div>} />
             <Route path="/newsletters" element={<div>Página de Newsletters em breve!</div>} />
