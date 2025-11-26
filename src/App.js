@@ -22,7 +22,8 @@ import AgenteABNT from './pages/AgenteABNT';
 import SpreadsheetGenerator from './pages/SpreadsheetGenerator';
 import ChatPDF from './pages/ChatPDF';
 import CorporateTranslator from './pages/CorporateTranslator'; 
-import SocialMediaGenerator from './pages/SocialMediaGenerator'; // <--- NOVA FERRAMENTA
+import SocialMediaGenerator from './pages/SocialMediaGenerator';
+import EssayCorrector from './pages/EssayCorrector'; // <--- NOVO IMPORT
 
 function App() {
   return (
@@ -75,13 +76,18 @@ function App() {
               element={<ProtectedRoute><CorporateTranslator /></ProtectedRoute>} 
             />
 
-            {/* NOVA ROTA DE SOCIAL MEDIA */}
             <Route 
               path="/social-media" 
               element={<ProtectedRoute><SocialMediaGenerator /></ProtectedRoute>} 
             />
+
+            {/* NOVA ROTA DE CORREÇÃO DE REDAÇÃO */}
+            <Route 
+              path="/corretor-redacao" 
+              element={<ProtectedRoute><EssayCorrector /></ProtectedRoute>} 
+            />
             
-            {/* Rotas de placeholder */}
+            {/* Rotas de placeholder (podemos remover as que não vamos usar mais) */}
             <Route path="/chat" element={<div>Página de Chat em breve!</div>} />
             <Route path="/cursos" element={<div>Página de Cursos em breve!</div>} />
             <Route path="/newsletters" element={<div>Página de Newsletters em breve!</div>} />

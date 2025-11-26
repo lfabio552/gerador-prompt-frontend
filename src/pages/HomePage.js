@@ -92,6 +92,20 @@ export default function HomePage() {
 
   const tools = [
     { 
+      id: 8, 
+      title: "Corretor ENEM", 
+      description: "Receba uma nota e correção detalhada para sua redação.", 
+      imageUrl: "https://placehold.co/600x400/b91c1c/ffffff?text=Nota+1000", 
+      link: "/corretor-redacao" 
+    },
+    { 
+      id: 7, 
+      title: "Social Media Kit", 
+      description: "Gera posts para Instagram, LinkedIn e Twitter automaticamente.", 
+      imageUrl: "https://placehold.co/600x400/db2777/ffffff?text=Social+Media", 
+      link: "/social-media" 
+    },
+    { 
       id: 1, 
       title: "Gerador de Prompts", 
       description: "Crie prompts detalhados para gerar imagens incríveis em IAs.", 
@@ -132,13 +146,6 @@ export default function HomePage() {
       description: "Transforme textos informais ou irritados em e-mails executivos polidos.", 
       imageUrl: "https://placehold.co/600x400/2563eb/ffffff?text=Email+Pro", 
       link: "/tradutor-corporativo" 
-    },
-    { 
-      id: 7, 
-      title: "Social Media Kit", 
-      description: "Gera posts para Instagram, LinkedIn e Twitter automaticamente.", 
-      imageUrl: "https://placehold.co/600x400/db2777/ffffff?text=Social+Media", 
-      link: "/social-media" 
     }
   ];
   
