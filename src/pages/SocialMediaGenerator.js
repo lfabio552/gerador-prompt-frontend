@@ -18,8 +18,8 @@ export default function SocialMediaGenerator() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Faça login para usar.');
 
-      // ATENÇÃO: Mude para o link do Render antes do deploy!
-      const response = await fetch('[https://meu-gerador-backend.onrender.com/generate-social-media](https://meu-gerador-backend.onrender.com/generate-social-media)', {
+      // URL do Render para produção
+      const response = await fetch('https://meu-gerador-backend.onrender.com/generate-social-media', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
@@ -60,7 +60,7 @@ export default function SocialMediaGenerator() {
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
-            placeholder="Ex: Lançamos hoje uma nova ferramenta de IA que ajuda estudantes a formatar ABNT..."
+            placeholder="Ex: Lançamos hoje uma nova ferramenta de IA..."
             required
             style={{ minHeight: '100px' }}
           />
