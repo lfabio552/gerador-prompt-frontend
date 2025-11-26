@@ -22,7 +22,7 @@ import AgenteABNT from './pages/AgenteABNT';
 import SpreadsheetGenerator from './pages/SpreadsheetGenerator';
 import ChatPDF from './pages/ChatPDF';
 import CorporateTranslator from './pages/CorporateTranslator'; 
-import SocialMediaGenerator from './pages/SocialMediaGenerator'; // <--- NOVA IMPORTAÇÃO
+import SocialMediaGenerator from './pages/SocialMediaGenerator'; // <--- NOVA FERRAMENTA
 
 function App() {
   return (
