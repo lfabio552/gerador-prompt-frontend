@@ -23,7 +23,8 @@ import SpreadsheetGenerator from './pages/SpreadsheetGenerator';
 import ChatPDF from './pages/ChatPDF';
 import CorporateTranslator from './pages/CorporateTranslator'; 
 import SocialMediaGenerator from './pages/SocialMediaGenerator';
-import EssayCorrector from './pages/EssayCorrector'; // <--- NOVO IMPORT
+import EssayCorrector from './pages/EssayCorrector';
+import InterviewSimulator from './pages/InterviewSimulator'; // <--- NOVO IMPORT
 
 function App() {
   return (
@@ -41,58 +42,21 @@ function App() {
 
             {/* --- ROTAS PROTEGIDAS (Ferramentas) --- */}
             
-            <Route 
-              path="/gerar-imagem" 
-              element={<ProtectedRoute><ImagePromptGenerator /></ProtectedRoute>} 
-            />
-
-            <Route 
-              path="/gerar-veo3-prompt" 
-              element={<ProtectedRoute><Veo3PromptGenerator /></ProtectedRoute>} 
-            />
-
-            <Route 
-              path="/resumir-video" 
-              element={<ProtectedRoute><VideoSummarizer /></ProtectedRoute>} 
-            />
-
-            <Route 
-              path="/agente-abnt" 
-              element={<ProtectedRoute><AgenteABNT /></ProtectedRoute>} 
-            />
-
-            <Route 
-              path="/gerador-planilha" 
-              element={<ProtectedRoute><SpreadsheetGenerator /></ProtectedRoute>} 
-            />
-
-            <Route 
-              path="/chat-pdf" 
-              element={<ProtectedRoute><ChatPDF /></ProtectedRoute>} 
-            />
-
-            <Route 
-              path="/tradutor-corporativo" 
-              element={<ProtectedRoute><CorporateTranslator /></ProtectedRoute>} 
-            />
-
-            <Route 
-              path="/social-media" 
-              element={<ProtectedRoute><SocialMediaGenerator /></ProtectedRoute>} 
-            />
-
-            {/* NOVA ROTA DE CORREÇÃO DE REDAÇÃO */}
-            <Route 
-              path="/corretor-redacao" 
-              element={<ProtectedRoute><EssayCorrector /></ProtectedRoute>} 
-            />
+            <Route path="/gerar-imagem" element={<ProtectedRoute><ImagePromptGenerator /></ProtectedRoute>} />
+            <Route path="/gerar-veo3-prompt" element={<ProtectedRoute><Veo3PromptGenerator /></ProtectedRoute>} />
+            <Route path="/resumir-video" element={<ProtectedRoute><VideoSummarizer /></ProtectedRoute>} />
+            <Route path="/agente-abnt" element={<ProtectedRoute><AgenteABNT /></ProtectedRoute>} />
+            <Route path="/gerador-planilha" element={<ProtectedRoute><SpreadsheetGenerator /></ProtectedRoute>} />
+            <Route path="/chat-pdf" element={<ProtectedRoute><ChatPDF /></ProtectedRoute>} />
+            <Route path="/tradutor-corporativo" element={<ProtectedRoute><CorporateTranslator /></ProtectedRoute>} />
+            <Route path="/social-media" element={<ProtectedRoute><SocialMediaGenerator /></ProtectedRoute>} />
+            <Route path="/corretor-redacao" element={<ProtectedRoute><EssayCorrector /></ProtectedRoute>} />
             
-            {/* Rotas de placeholder (podemos remover as que não vamos usar mais) */}
+            {/* NOVA ROTA DE ENTREVISTA */}
+            <Route path="/simulador-entrevista" element={<ProtectedRoute><InterviewSimulator /></ProtectedRoute>} />
+            
+            {/* Rotas de placeholder */}
             <Route path="/chat" element={<div>Página de Chat em breve!</div>} />
-            <Route path="/cursos" element={<div>Página de Cursos em breve!</div>} />
-            <Route path="/newsletters" element={<div>Página de Newsletters em breve!</div>} />
-            <Route path="/chat-com-pesquisa" element={<div>Chat com pesquisa em breve!</div>} />
-            <Route path="/analisar-imagens" element={<div>Analisar imagens em breve!</div>} />
 
           </Routes>
         </main>

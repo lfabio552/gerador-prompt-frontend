@@ -65,7 +65,6 @@ export default function HomePage() {
   const handleSubscribe = async () => {
     if (!user) return alert("Faça login primeiro!");
     try {
-      // Link de Produção (Render)
       const response = await fetch('https://meu-gerador-backend.onrender.com/create-checkout-session', { 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -91,6 +90,13 @@ export default function HomePage() {
   };
 
   const tools = [
+    { 
+      id: 9, 
+      title: "Simulador Entrevista", 
+      description: "Treine para sua vaga dos sonhos com perguntas reais.", 
+      imageUrl: "https://placehold.co/600x400/4c1d95/ffffff?text=Entrevista+RH", 
+      link: "/simulador-entrevista" 
+    },
     { 
       id: 8, 
       title: "Corretor ENEM", 
