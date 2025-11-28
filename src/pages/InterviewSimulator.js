@@ -21,7 +21,7 @@ export default function InterviewSimulator() {
 
       // --- ATENÇÃO AQUI: TROQUE PELO SEU LINK DO RENDER ---
       // Exemplo: 'https://seu-projeto-123.onrender.com/mock-interview'
-      const response = await fetch('https://meu-gerador-backend.onrender.com', {
+      const response = await fetch('https://meu-gerador-backend.onrender.com/mock-interview', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
