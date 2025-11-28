@@ -91,6 +91,13 @@ export default function HomePage() {
 
   const tools = [
     { 
+      id: 10, 
+      title: "Gerador de Estudos", 
+      description: "Crie Quizzes e Flashcards automáticos para estudar.", 
+      imageUrl: "https://placehold.co/600x400/065f46/ffffff?text=Quiz+IA", 
+      link: "/gerador-estudos" 
+    },
+    { 
       id: 9, 
       title: "Simulador Entrevista", 
       description: "Treine para sua vaga dos sonhos com perguntas reais.", 
