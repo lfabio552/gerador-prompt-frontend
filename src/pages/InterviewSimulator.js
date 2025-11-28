@@ -19,7 +19,9 @@ export default function InterviewSimulator() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Faça login para simular a entrevista.');
 
-      const response = await fetch('https://meu-gerador-backend.onrender.com/mock-interview', {
+      // --- ATENÇÃO AQUI: TROQUE PELO SEU LINK DO RENDER ---
+      // Exemplo: 'https://seu-projeto-123.onrender.com/mock-interview'
+      const response = await fetch('https://meu-gerador-backend.onrender.com', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
