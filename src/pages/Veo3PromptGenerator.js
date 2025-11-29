@@ -3,6 +3,9 @@ import '../App.css';
 import { supabase } from '../supabaseClient';
 
 export default function Veo3PromptGenerator() {
+  // Novo estado para o Modelo
+  const [model, setModel] = useState('Veo 3'); 
+  
   const [scene, setScene] = useState('');
   const [style, setStyle] = useState('Cinematográfico (Realista)');
   const [camera, setCamera] = useState('Plano Aberto (Wide Shot)');
@@ -21,17 +24,17 @@ export default function Veo3PromptGenerator() {
     const finalLighting = lighting === 'outro' ? customLighting : lighting;
 
     try {
-      // 1. Pegar usuário logado
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Você precisa estar logado.');
 
-      // 2. Enviar pedido com user_id
+      // --- IMPORTANTE: TROQUE PELO SEU LINK DO RENDER ---
       const response = await fetch('https://meu-gerador-backend.onrender.com/generate-veo3-prompt', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ 
+          model, // Enviando o modelo escolhido (Veo 3 ou Sora 2)
           scene, 
           style, 
           camera, 
@@ -41,7 +44,6 @@ export default function Veo3PromptGenerator() {
         }),
       });
 
-      // 3. Verificar se faltou crédito
       if (response.status === 402) {
         const errorData = await response.json();
         throw new Error(errorData.error);
@@ -64,11 +66,25 @@ export default function Veo3PromptGenerator() {
   return (
     <div className="container">
       <header>
-        <h1>Gerador de Prompts para VEO 3</h1>
-        <p>Preencha os campos para criar um prompt de vídeo detalhado.</p>
+        <h1>Gerador de Vídeo IA 🎬</h1>
+        <p>Crie prompts perfeitos para Google Veo 3 e OpenAI Sora 2.</p>
       </header>
       
       <form onSubmit={handleSubmit} style={{ textAlign: 'left' }}>
+        
+        {/* SELETOR DE MODELO (A Novidade!) */}
+        <div className="form-group" style={{backgroundColor: '#374151', padding: '15px', borderRadius: '8px', border: '1px solid #7e22ce'}}>
+            <label style={{color: '#d8b4fe', fontWeight: 'bold'}}>Qual IA você vai usar?</label>
+            <select 
+                value={model} 
+                onChange={(e) => setModel(e.target.value)}
+                style={{width: '100%', marginTop: '5px', fontWeight: 'bold', padding: '10px', borderRadius: '5px'}}
+            >
+                <option value="Veo 3">Google Veo 3 (Melhor para Cinema/Técnica)</option>
+                <option value="Sora 2">OpenAI Sora 2 (Melhor para Física/Realismo)</option>
+            </select>
+        </div>
+
         <div className="form-group">
           <label>1. Descrição da Cena Principal:</label>
           <textarea value={scene} onChange={(e) => setScene(e.target.value)} placeholder="Ex: Um astronauta solitário encontra uma flor crescendo em Marte." />
@@ -82,6 +98,7 @@ export default function Veo3PromptGenerator() {
             <option>Anime (Estilo Ghibli)</option>
             <option>Documentário</option>
             <option>Filmagem Vintage (8mm)</option>
+            <option>Cyberpunk / Neon</option>
           </select>
         </div>
 
@@ -92,7 +109,8 @@ export default function Veo3PromptGenerator() {
             <option>Close-up no Rosto</option>
             <option>Câmera Lenta (Slow Motion)</option>
             <option>Plano Sequência (Tracking Shot)</option>
-            <option>Visão de Drone</option>
+            <option>Visão de Drone (Flyover)</option>
+            <option>Câmera de Mão (Handheld)</option>
           </select>
         </div>
         
@@ -103,7 +121,7 @@ export default function Veo3PromptGenerator() {
             <option>Luz do meio-dia (forte)</option>
             <option>Noite com luz de neon</option>
             <option>Sombrio e misterioso (pouca luz)</option>
-            <option>Luz de estúdio</option>
+            <option>Luz de estúdio (Suave)</option>
             <option value="outro">Outro (especificar)...</option>
           </select>
 
@@ -124,13 +142,13 @@ export default function Veo3PromptGenerator() {
         </div>
 
         <button type="submit" disabled={isLoading}>
-          {isLoading ? 'Gerando (-1 Crédito)...' : 'Gerar Prompt Final'}
+          {isLoading ? 'Gerando (-1 Crédito)...' : `Gerar Prompt para ${model}`}
         </button>
       </form>
 
       {advancedPrompt && (
         <div className="result-container" style={{ textAlign: 'left' }}>
-          <h2>Seu Prompt Otimizado:</h2>
+          <h2 style={{color: model === 'Sora 2' ? '#10a37f' : '#ea4335'}}>Seu Prompt ({model}):</h2>
           <div className="prompt-box">
             <p>{advancedPrompt}</p>
           </div>
