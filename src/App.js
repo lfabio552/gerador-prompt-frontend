@@ -25,7 +25,8 @@ import CorporateTranslator from './pages/CorporateTranslator';
 import SocialMediaGenerator from './pages/SocialMediaGenerator';
 import EssayCorrector from './pages/EssayCorrector';
 import InterviewSimulator from './pages/InterviewSimulator';
-import StudyMaterialGenerator from './pages/StudyMaterialGenerator'; // <--- NOVO IMPORT
+import StudyMaterialGenerator from './pages/StudyMaterialGenerator';
+import CoverLetterGenerator from './pages/CoverLetterGenerator'; // <--- NOVO IMPORT
 
 function App() {
   return (
@@ -53,9 +54,10 @@ function App() {
             <Route path="/social-media" element={<ProtectedRoute><SocialMediaGenerator /></ProtectedRoute>} />
             <Route path="/corretor-redacao" element={<ProtectedRoute><EssayCorrector /></ProtectedRoute>} />
             <Route path="/simulador-entrevista" element={<ProtectedRoute><InterviewSimulator /></ProtectedRoute>} />
-            
-            {/* NOVA ROTA DE ESTUDOS */}
             <Route path="/gerador-estudos" element={<ProtectedRoute><StudyMaterialGenerator /></ProtectedRoute>} />
+            
+            {/* NOVA ROTA DE CARTA */}
+            <Route path="/gerador-carta" element={<ProtectedRoute><CoverLetterGenerator /></ProtectedRoute>} />
             
             {/* Rotas de placeholder */}
             <Route path="/chat" element={<div>Página de Chat em breve!</div>} />

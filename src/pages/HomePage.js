@@ -105,16 +105,16 @@ export default function HomePage() {
       link: "/simulador-entrevista" 
     },
     { 
+      id: 11, title: "Carta de Apresentação", 
+      description: "Crie cartas persuasivas para anexar ao currículo.", 
+      imageUrl: "https://placehold.co/600x400/ea580c/ffffff?text=Cover+Letter", 
+      link: "/gerador-carta" 
+    },
+    { 
       id: 5, title: "Chat com PDF (RAG)", 
       description: "Converse com seus documentos e tire dúvidas.", 
       imageUrl: "https://placehold.co/600x400/be185d/ffffff?text=Chat+PDF", 
       link: "/chat-pdf" 
-    },
-    { 
-      id: 8, title: "Corretor ENEM", 
-      description: "Nota e correção detalhada para sua redação.", 
-      imageUrl: "https://placehold.co/600x400/b91c1c/ffffff?text=Nota+1000", 
-      link: "/corretor-redacao" 
     },
   ];
 
@@ -131,12 +131,11 @@ export default function HomePage() {
       imageUrl: "https://placehold.co/600x400/1e3a8a/ffffff?text=DOCX+ABNT", 
       link: "/agente-abnt" 
     },
-    // Repetindo o Chat PDF aqui pois é útil para estudantes também
     { 
-      id: 5, title: "Chat com PDF", 
-      description: "Resuma apostilas e livros difíceis.", 
-      imageUrl: "https://placehold.co/600x400/be185d/ffffff?text=Leitura+Dinamica", 
-      link: "/chat-pdf" 
+      id: 8, title: "Corretor ENEM", 
+      description: "Nota e correção detalhada para sua redação.", 
+      imageUrl: "https://placehold.co/600x400/b91c1c/ffffff?text=Nota+1000", 
+      link: "/corretor-redacao" 
     },
   ];
 
@@ -156,6 +155,12 @@ export default function HomePage() {
   ];
 
   const productivityTools = [
+    { 
+      id: 11, title: "Carta de Apresentação", 
+      description: "Crie cartas persuasivas para anexar ao currículo.", 
+      imageUrl: "https://placehold.co/600x400/ea580c/ffffff?text=Cover+Letter", 
+      link: "/gerador-carta" 
+    },
     { 
       id: 6, title: "Tradutor Corporativo", 
       description: "Transforme textos informais em e-mails executivos.", 
