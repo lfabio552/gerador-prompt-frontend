@@ -13,6 +13,7 @@ import Home from './pages/HomePage';
 import Login from './pages/Login';
 import ForgotPassword from './pages/ForgotPassword';
 import UpdatePassword from './pages/UpdatePassword';
+import TermsAndPrivacy from './pages/TermsAndPrivacy'; // <--- IMPORT NOVO
 
 // Ferramentas
 import ImagePromptGenerator from './pages/ImagePromptGenerator';
@@ -26,7 +27,7 @@ import SocialMediaGenerator from './pages/SocialMediaGenerator';
 import EssayCorrector from './pages/EssayCorrector';
 import InterviewSimulator from './pages/InterviewSimulator';
 import StudyMaterialGenerator from './pages/StudyMaterialGenerator';
-import CoverLetterGenerator from './pages/CoverLetterGenerator'; // <--- NOVO IMPORT
+import CoverLetterGenerator from './pages/CoverLetterGenerator';
 
 function App() {
   return (
@@ -41,6 +42,9 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/update-password" element={<UpdatePassword />} />
+            
+            {/* NOVA ROTA DE TERMOS */}
+            <Route path="/termos" element={<TermsAndPrivacy />} />
 
             {/* --- ROTAS PROTEGIDAS (Ferramentas) --- */}
             
@@ -55,8 +59,6 @@ function App() {
             <Route path="/corretor-redacao" element={<ProtectedRoute><EssayCorrector /></ProtectedRoute>} />
             <Route path="/simulador-entrevista" element={<ProtectedRoute><InterviewSimulator /></ProtectedRoute>} />
             <Route path="/gerador-estudos" element={<ProtectedRoute><StudyMaterialGenerator /></ProtectedRoute>} />
-            
-            {/* NOVA ROTA DE CARTA */}
             <Route path="/gerador-carta" element={<ProtectedRoute><CoverLetterGenerator /></ProtectedRoute>} />
             
             {/* Rotas de placeholder */}

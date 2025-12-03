@@ -4,7 +4,7 @@ import Slider from 'react-slick';
 import { ChevronLeftIcon, ChevronRightIcon, UserCircleIcon, ArrowRightOnRectangleIcon, Cog6ToothIcon } from '@heroicons/react/24/solid';
 import { supabase } from '../supabaseClient'; 
 
-// --- SETAS DO CARROSSEL (Reutilizáveis) ---
+// --- SETAS DO CARROSSEL ---
 function SampleNextArrow(props) {
   const { className, style, onClick } = props;
   return (
@@ -156,12 +156,6 @@ export default function HomePage() {
 
   const productivityTools = [
     { 
-      id: 11, title: "Carta de Apresentação", 
-      description: "Crie cartas persuasivas para anexar ao currículo.", 
-      imageUrl: "https://placehold.co/600x400/ea580c/ffffff?text=Cover+Letter", 
-      link: "/gerador-carta" 
-    },
-    { 
       id: 6, title: "Tradutor Corporativo", 
       description: "Transforme textos informais em e-mails executivos.", 
       imageUrl: "https://placehold.co/600x400/2563eb/ffffff?text=Email+Pro", 
@@ -289,6 +283,10 @@ export default function HomePage() {
       
       <footer style={{ textAlign: 'center', color: '#6b7280', padding: '40px', marginTop: '50px', borderTop: '1px solid #1f2937' }}>
         <p>&copy; {new Date().getFullYear()} Adapta IA. Todos os direitos reservados.</p>
+        <div style={{ marginTop: '10px' }}>
+          <Link to="/termos" style={{ color: '#9ca3af', textDecoration: 'none', fontSize: '0.9rem', marginRight: '15px' }}>Termos de Uso</Link>
+          <Link to="/termos" style={{ color: '#9ca3af', textDecoration: 'none', fontSize: '0.9rem' }}>Política de Privacidade</Link>
+        </div>
       </footer>
     </div>
   );
