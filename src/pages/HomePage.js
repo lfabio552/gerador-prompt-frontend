@@ -116,6 +116,13 @@ export default function HomePage() {
       imageUrl: "https://placehold.co/600x400/be185d/ffffff?text=Chat+PDF", 
       link: "/chat-pdf" 
     },
+    { 
+      id: 13, 
+      title: "Resumidor de Textos", 
+      description: "Resuma artigos, documentos e transcrições longas.", 
+      imageUrl: "https://placehold.co/600x400/0d9488/ffffff?text=Resumo+IA", 
+      link: "/resumir-texto" 
+     },
   ];
 
   const academicTools = [
