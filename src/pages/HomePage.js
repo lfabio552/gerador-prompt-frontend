@@ -4,17 +4,28 @@ import Slider from 'react-slick';
 import { ChevronLeftIcon, ChevronRightIcon, UserCircleIcon, ArrowRightOnRectangleIcon, Cog6ToothIcon } from '@heroicons/react/24/solid';
 import { supabase } from '../supabaseClient'; 
 
-// --- SETAS DO CARROSSEL ---
+// --- SETAS DO CARROSSEL (Responsivas) ---
 function SampleNextArrow(props) {
   const { className, style, onClick } = props;
   return (
     <div
       className={className}
-      style={{ ...style, display: "flex", background: "#7e22ce", borderRadius: '50%', width: '40px', height: '40px', right: '-15px', justifyContent: 'center', alignItems: 'center', zIndex: 50, boxShadow: '0 4px 6px rgba(0,0,0,0.3)', cursor: 'pointer' }}
+      style={{ 
+        ...style, 
+        display: "flex", 
+        background: "#7e22ce", 
+        borderRadius: '50%', 
+        width: '40px', 
+        height: '40px', 
+        right: window.innerWidth < 768 ? '-5px' : '-15px', // Ajustado para mobile
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        zIndex: 50, 
+        boxShadow: '0 4px 6px rgba(0,0,0,0.3)', 
+        cursor: 'pointer' 
+      }}
       onClick={onClick}
-    >
-      <ChevronRightIcon style={{ width: '20px', height: '20px', color: 'white' }} />
-    </div>
+    />
   );
 }
 
@@ -23,11 +34,22 @@ function SamplePrevArrow(props) {
   return (
     <div
       className={className}
-      style={{ ...style, display: "flex", background: "#7e22ce", borderRadius: '50%', width: '40px', height: '40px', left: '-15px', justifyContent: 'center', alignItems: 'center', zIndex: 50, boxShadow: '0 4px 6px rgba(0,0,0,0.3)', cursor: 'pointer' }}
+      style={{ 
+        ...style, 
+        display: "flex", 
+        background: "#7e22ce", 
+        borderRadius: '50%', 
+        width: '40px', 
+        height: '40px', 
+        left: window.innerWidth < 768 ? '-5px' : '-15px', // Ajustado para mobile
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        zIndex: 50, 
+        boxShadow: '0 4px 6px rgba(0,0,0,0.3)', 
+        cursor: 'pointer' 
+      }}
       onClick={onClick}
-    >
-      <ChevronLeftIcon style={{ width: '20px', height: '20px', color: 'white' }} />
-    </div>
+    />
   );
 }
 
@@ -35,6 +57,14 @@ export default function HomePage() {
   const [user, setUser] = useState(null);
   const [credits, setCredits] = useState(null);
   const [isPro, setIsPro] = useState(false);
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+  // Monitorar tamanho da tela para responsividade
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     const getUserData = async () => {
@@ -116,13 +146,6 @@ export default function HomePage() {
       imageUrl: "https://placehold.co/600x400/be185d/ffffff?text=Chat+PDF", 
       link: "/chat-pdf" 
     },
-    { 
-      id: 13, 
-      title: "Resumidor de Textos", 
-      description: "Resuma artigos, documentos e transcrições longas.", 
-      imageUrl: "https://placehold.co/600x400/0d9488/ffffff?text=Resumo+IA", 
-      link: "/resumir-texto" 
-     },
   ];
 
   const academicTools = [
@@ -159,6 +182,12 @@ export default function HomePage() {
       imageUrl: "https://placehold.co/600x400/374151/ffffff?text=Video+Prompt", 
       link: "/gerar-veo3-prompt" 
     },
+    { 
+      id: 13, title: "Resumidor de Textos", 
+      description: "Resuma artigos, documentos e transcrições longas.", 
+      imageUrl: "https://placehold.co/600x400/0d9488/ffffff?text=Resumo+IA", 
+      link: "/resumir-texto" 
+    },
   ];
 
   const productivityTools = [
@@ -176,28 +205,101 @@ export default function HomePage() {
     },
   ];
   
+  // CONFIGURAÇÃO DO CARROSSEL RESPONSIVO
   const settings = {
-    dots: false, infinite: false, speed: 500, slidesToShow: 3.2, slidesToScroll: 1, nextArrow: <SampleNextArrow />, prevArrow: <SamplePrevArrow />,
-    responsive: [ { breakpoint: 1024, settings: { slidesToShow: 2.2 } }, { breakpoint: 640, settings: { slidesToShow: 1.2, arrows: false } } ]
+    dots: false,
+    infinite: false,
+    speed: 500,
+    slidesToShow: windowWidth < 480 ? 1.2 : windowWidth < 768 ? 1.5 : windowWidth < 1024 ? 2.2 : 3.2,
+    slidesToScroll: 1,
+    nextArrow: windowWidth < 768 ? <></> : <SampleNextArrow />,
+    prevArrow: windowWidth < 768 ? <></> : <SamplePrevArrow />,
   };
 
   // Componente interno para renderizar uma seção
   const ToolSection = ({ title, tools, icon }) => (
-    <div style={{ marginBottom: '50px' }}>
-      <h3 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '10px', color: '#f3f4f6' }}>
+    <div style={{ marginBottom: windowWidth < 768 ? '30px' : '50px' }}>
+      <h3 style={{ 
+        fontSize: windowWidth < 768 ? '1.2rem' : '1.5rem', 
+        fontWeight: 'bold', 
+        marginBottom: '15px', 
+        display: 'flex', 
+        alignItems: 'center', 
+        gap: '10px', 
+        color: '#f3f4f6',
+        paddingLeft: '5px'
+      }}>
         {icon} {title}
       </h3>
       <Slider {...settings}>
         {tools.map((tool) => (
-          <div key={tool.id} style={{ padding: '0 10px' }}>
-            <div style={{ backgroundColor: '#1f2937', borderRadius: '12px', overflow: 'hidden', height: '100%', border: '1px solid #374151', display: 'flex', flexDirection: 'column' }}>
-              <div style={{ height: '160px', overflow: 'hidden' }}>
-                <img src={tool.imageUrl} alt={tool.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+          <div key={tool.id} style={{ padding: '0 8px' }}>
+            <div style={{ 
+              backgroundColor: '#1f2937', 
+              borderRadius: '12px', 
+              overflow: 'hidden', 
+              height: '100%', 
+              border: '1px solid #374151', 
+              display: 'flex', 
+              flexDirection: 'column',
+              minHeight: windowWidth < 768 ? '280px' : '320px'
+            }}>
+              <div style={{ 
+                height: windowWidth < 768 ? '120px' : '160px', 
+                overflow: 'hidden' 
+              }}>
+                <img 
+                  src={tool.imageUrl} 
+                  alt={tool.title} 
+                  style={{ 
+                    width: '100%', 
+                    height: '100%', 
+                    objectFit: 'cover' 
+                  }} 
+                />
               </div>
-              <div style={{ padding: '20px', flexGrow: 1, display: 'flex', flexDirection: 'column' }}>
-                <h4 style={{ fontSize: '1.1rem', fontWeight: 'bold', marginBottom: '8px', color: '#fff' }}>{tool.title}</h4>
-                <p style={{ color: '#9ca3af', marginBottom: '15px', flexGrow: 1, fontSize: '0.85rem' }}>{tool.description}</p>
-                <Link to={tool.link} style={{ display: 'block', width: '100%', backgroundColor: '#7e22ce', color: 'white', fontWeight: 'bold', padding: '10px', borderRadius: '8px', textAlign: 'center', textDecoration: 'none', fontSize: '0.9rem' }}>
+              <div style={{ 
+                padding: windowWidth < 768 ? '15px' : '20px', 
+                flexGrow: 1, 
+                display: 'flex', 
+                flexDirection: 'column' 
+              }}>
+                <h4 style={{ 
+                  fontSize: windowWidth < 768 ? '1rem' : '1.1rem', 
+                  fontWeight: 'bold', 
+                  marginBottom: '8px', 
+                  color: '#fff' 
+                }}>
+                  {tool.title}
+                </h4>
+                <p style={{ 
+                  color: '#9ca3af', 
+                  marginBottom: '15px', 
+                  flexGrow: 1, 
+                  fontSize: windowWidth < 768 ? '0.8rem' : '0.85rem',
+                  lineHeight: '1.4'
+                }}>
+                  {tool.description}
+                </p>
+                <Link 
+                  to={tool.link} 
+                  style={{ 
+                    display: 'block', 
+                    width: '100%', 
+                    backgroundColor: '#7e22ce', 
+                    color: 'white', 
+                    fontWeight: 'bold', 
+                    padding: windowWidth < 768 ? '8px 12px' : '10px', 
+                    borderRadius: '8px', 
+                    textAlign: 'center', 
+                    textDecoration: 'none', 
+                    fontSize: windowWidth < 768 ? '0.85rem' : '0.9rem',
+                    minHeight: '40px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                >
                   Acessar
                 </Link>
               </div>
@@ -209,90 +311,277 @@ export default function HomePage() {
   );
 
   return (
-    <div style={{ minHeight: '100vh', backgroundColor: '#111827', color: 'white', paddingBottom: '50px', fontFamily: 'sans-serif' }}>
+    <div style={{ 
+      minHeight: '100vh', 
+      backgroundColor: '#111827', 
+      color: 'white', 
+      paddingBottom: '30px', 
+      fontFamily: 'sans-serif',
+      overflowX: 'hidden',
+      padding: windowWidth < 768 ? '0 10px' : '0 20px'
+    }}>
       
-      {/* HEADER / NAVBAR */}
-      <div style={{ padding: '20px 40px', display: 'flex', justifyContent: 'flex-end', alignItems: 'center' }}>
+      {/* HEADER / NAVBAR RESPONSIVA */}
+      <div style={{ 
+        padding: windowWidth < 768 ? '15px 10px' : '20px 20px', 
+        display: 'flex', 
+        justifyContent: windowWidth < 768 ? 'center' : 'flex-end', 
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        gap: windowWidth < 768 ? '10px' : '15px'
+      }}>
           {user ? (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+            <div style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: windowWidth < 768 ? '8px' : '15px',
+              flexWrap: windowWidth < 768 ? 'wrap' : 'nowrap',
+              justifyContent: windowWidth < 768 ? 'center' : 'flex-end',
+              width: '100%'
+            }}>
+              {/* Botão PRO/Assinatura */}
               {!isPro ? (
-                  <button onClick={handleSubscribe} style={{ background: 'linear-gradient(90deg, #fbbf24 0%, #d97706 100%)', border: 'none', padding: '8px 16px', borderRadius: '20px', color: '#fff', fontWeight: 'bold', fontSize: '14px', cursor: 'pointer', boxShadow: '0 0 10px rgba(251, 191, 36, 0.5)' }}>
-                  👑 Virar PRO
+                  <button 
+                    onClick={handleSubscribe} 
+                    style={{ 
+                      background: 'linear-gradient(90deg, #fbbf24 0%, #d97706 100%)', 
+                      border: 'none', 
+                      padding: windowWidth < 768 ? '10px 15px' : '8px 16px', 
+                      borderRadius: '20px', 
+                      color: '#fff', 
+                      fontWeight: 'bold', 
+                      fontSize: windowWidth < 768 ? '13px' : '14px', 
+                      cursor: 'pointer', 
+                      boxShadow: '0 0 10px rgba(251, 191, 36, 0.5)',
+                      minHeight: '40px',
+                      minWidth: windowWidth < 768 ? '120px' : 'auto',
+                      whiteSpace: 'nowrap'
+                    }}
+                  >
+                    👑 Virar PRO
                   </button>
               ) : (
-                  <button onClick={handlePortal} style={{ background: '#374151', border: '1px solid #6b7280', padding: '8px 16px', borderRadius: '20px', color: '#d1d5db', fontWeight: 'bold', fontSize: '14px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px' }}>
-                  <Cog6ToothIcon style={{ width: '16px', height: '16px' }}/> Minha Assinatura
+                  <button 
+                    onClick={handlePortal} 
+                    style={{ 
+                      background: '#374151', 
+                      border: '1px solid #6b7280', 
+                      padding: windowWidth < 768 ? '10px 15px' : '8px 16px', 
+                      borderRadius: '20px', 
+                      color: '#d1d5db', 
+                      fontWeight: 'bold', 
+                      fontSize: windowWidth < 768 ? '13px' : '14px', 
+                      cursor: 'pointer', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      gap: '5px',
+                      minHeight: '40px',
+                      whiteSpace: 'nowrap'
+                    }}
+                  >
+                    <Cog6ToothIcon style={{ width: '16px', height: '16px' }}/> 
+                    <span style={{ display: windowWidth < 480 ? 'none' : 'inline' }}>
+                      Minha Assinatura
+                    </span>
                   </button>
               )}
-              <div style={{ backgroundColor: isPro ? '#581c87' : '#374151', padding: '6px 12px', borderRadius: '20px', border: isPro ? '1px solid #d8b4fe' : '1px solid #7e22ce', color: isPro ? '#fff' : '#e9d5ff', fontWeight: 'bold', fontSize: '14px' }}>
+              
+              {/* Créditos */}
+              <div style={{ 
+                backgroundColor: isPro ? '#581c87' : '#374151', 
+                padding: windowWidth < 768 ? '8px 15px' : '6px 12px', 
+                borderRadius: '20px', 
+                border: isPro ? '1px solid #d8b4fe' : '1px solid #7e22ce', 
+                color: isPro ? '#fff' : '#e9d5ff', 
+                fontWeight: 'bold', 
+                fontSize: windowWidth < 768 ? '13px' : '14px',
+                minHeight: '40px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                minWidth: windowWidth < 768 ? '80px' : 'auto'
+              }}>
                 💎 {isPro ? "ILIMITADO" : (credits !== null ? credits : 0)}
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: '#d1d5db' }}>
-                  <UserCircleIcon style={{ width: '36px', height: '36px', color: '#a855f7' }} />
+              
+              {/* Ícone do usuário e logout */}
+              <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: windowWidth < 768 ? '5px' : '8px', 
+                color: '#d1d5db' 
+              }}>
+                <UserCircleIcon style={{ 
+                  width: windowWidth < 768 ? '32px' : '36px', 
+                  height: windowWidth < 768 ? '32px' : '36px', 
+                  color: '#a855f7' 
+                }} />
+                <button 
+                  onClick={handleLogout} 
+                  style={{ 
+                    color: '#ef4444', 
+                    background: 'none', 
+                    border: 'none', 
+                    cursor: 'pointer', 
+                    fontWeight: 'bold',
+                    fontSize: windowWidth < 768 ? '13px' : '14px',
+                    padding: '5px'
+                  }}
+                >
+                  Sair
+                </button>
               </div>
-              <button onClick={handleLogout} style={{ marginLeft: '10px', color: '#ef4444', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 'bold' }}>Sair</button>
             </div>
           ) : (
-            <Link to="/login" style={{ display: 'flex', alignItems: 'center', gap: '10px', textDecoration: 'none', color: '#d1d5db', backgroundColor: '#1f2937', padding: '10px 20px', borderRadius: '9999px', border: '1px solid #374151' }}>
+            <Link 
+              to="/login" 
+              style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '10px', 
+                textDecoration: 'none', 
+                color: '#d1d5db', 
+                backgroundColor: '#1f2937', 
+                padding: windowWidth < 768 ? '12px 20px' : '10px 20px', 
+                borderRadius: '9999px', 
+                border: '1px solid #374151',
+                minHeight: '40px',
+                width: windowWidth < 768 ? '100%' : 'auto',
+                justifyContent: 'center',
+                maxWidth: '200px',
+                margin: windowWidth < 768 ? '0 auto' : '0'
+              }}
+            >
                 <span style={{ fontWeight: 'bold', fontSize: '14px' }}>Login</span>
                 <UserCircleIcon style={{ width: '24px', height: '24px' }} />
             </Link>
           )}
       </div>
 
-      {/* HERO SECTION */}
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '20px 40px', marginBottom: '40px' }}>
-        <div style={{ padding: '60px', borderRadius: '24px', background: 'linear-gradient(135deg, #4c1d95 0%, #1f2937 100%)', position: 'relative', overflow: 'hidden', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.3)' }}>
+      {/* HERO SECTION RESPONSIVA */}
+      <div style={{ 
+        maxWidth: '1200px', 
+        margin: '0 auto', 
+        padding: windowWidth < 768 ? '10px 5px' : '20px 20px', 
+        marginBottom: windowWidth < 768 ? '20px' : '40px' 
+      }}>
+        <div style={{ 
+          padding: windowWidth < 768 ? '30px 20px' : '60px', 
+          borderRadius: '24px', 
+          background: 'linear-gradient(135deg, #4c1d95 0%, #1f2937 100%)', 
+          position: 'relative', 
+          overflow: 'hidden', 
+          boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.3)' 
+        }}>
           <div style={{ position: 'relative', zIndex: 10 }}>
-            <h1 style={{ fontSize: '3.5rem', fontWeight: '800', color: '#fff', marginBottom: '15px', lineHeight: '1.1' }}>
+            <h1 style={{ 
+              fontSize: windowWidth < 480 ? '1.8rem' : windowWidth < 768 ? '2.2rem' : '3.5rem', 
+              fontWeight: '800', 
+              color: '#fff', 
+              marginBottom: windowWidth < 768 ? '10px' : '15px', 
+              lineHeight: '1.1',
+              textAlign: windowWidth < 768 ? 'center' : 'left'
+            }}>
               Potencialize sua <br/><span style={{ color: '#fbbf24' }}>Produtividade</span> com IA.
             </h1>
-            <p style={{ fontSize: '1.25rem', color: '#d1d5db', maxWidth: '600px', marginBottom: '30px' }}>
+            <p style={{ 
+              fontSize: windowWidth < 768 ? '1rem' : '1.25rem', 
+              color: '#d1d5db', 
+              maxWidth: windowWidth < 768 ? '100%' : '600px', 
+              marginBottom: windowWidth < 768 ? '20px' : '30px',
+              textAlign: windowWidth < 768 ? 'center' : 'left'
+            }}>
               Mais de 10 ferramentas inteligentes para estudantes, profissionais e criativos. Acesse tudo em um só lugar.
             </p>
             {!user && (
-              <Link to="/login" style={{ backgroundColor: '#fbbf24', color: '#111827', padding: '12px 30px', borderRadius: '50px', fontWeight: 'bold', textDecoration: 'none', fontSize: '1.1rem', display: 'inline-block' }}>
-                Começar Grátis
-              </Link>
+              <div style={{ textAlign: windowWidth < 768 ? 'center' : 'left' }}>
+                <Link 
+                  to="/login" 
+                  style={{ 
+                    backgroundColor: '#fbbf24', 
+                    color: '#111827', 
+                    padding: windowWidth < 768 ? '12px 25px' : '12px 30px', 
+                    borderRadius: '50px', 
+                    fontWeight: 'bold', 
+                    textDecoration: 'none', 
+                    fontSize: windowWidth < 768 ? '1rem' : '1.1rem', 
+                    display: 'inline-block',
+                    minHeight: '50px',
+                    minWidth: windowWidth < 768 ? '200px' : 'auto'
+                  }}
+                >
+                  Começar Grátis
+                </Link>
+              </div>
             )}
           </div>
         </div>
       </div>
       
       {/* SEÇÕES DE FERRAMENTAS */}
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 40px' }}>
+      <div style={{ 
+        maxWidth: '1200px', 
+        margin: '0 auto', 
+        padding: windowWidth < 768 ? '0 5px' : '0 20px' 
+      }}>
         
         <ToolSection 
           title="Mais Usadas" 
           tools={featuredTools} 
-          icon={<span style={{fontSize: '24px'}}>🔥</span>} 
+          icon={<span style={{fontSize: windowWidth < 768 ? '20px' : '24px'}}>🔥</span>} 
         />
 
         <ToolSection 
           title="Área Acadêmica" 
           tools={academicTools} 
-          icon={<span style={{fontSize: '24px'}}>🎓</span>} 
+          icon={<span style={{fontSize: windowWidth < 768 ? '20px' : '24px'}}>🎓</span>} 
         />
 
         <ToolSection 
           title="Estúdio Criativo (Prompts)" 
           tools={creativeTools} 
-          icon={<span style={{fontSize: '24px'}}>🎨</span>} 
+          icon={<span style={{fontSize: windowWidth < 768 ? '20px' : '24px'}}>🎨</span>} 
         />
 
         <ToolSection 
           title="Produtividade & Trabalho" 
           tools={productivityTools} 
-          icon={<span style={{fontSize: '24px'}}>💼</span>} 
+          icon={<span style={{fontSize: windowWidth < 768 ? '20px' : '24px'}}>💼</span>} 
         />
 
       </div>
       
-      <footer style={{ textAlign: 'center', color: '#6b7280', padding: '40px', marginTop: '50px', borderTop: '1px solid #1f2937' }}>
+      <footer style={{ 
+        textAlign: 'center', 
+        color: '#6b7280', 
+        padding: windowWidth < 768 ? '20px 10px' : '40px', 
+        marginTop: windowWidth < 768 ? '20px' : '50px', 
+        borderTop: '1px solid #1f2937',
+        fontSize: windowWidth < 768 ? '0.8rem' : '0.9rem'
+      }}>
         <p>&copy; {new Date().getFullYear()} Adapta IA. Todos os direitos reservados.</p>
         <div style={{ marginTop: '10px' }}>
-          <Link to="/termos" style={{ color: '#9ca3af', textDecoration: 'none', fontSize: '0.9rem', marginRight: '15px' }}>Termos de Uso</Link>
-          <Link to="/termos" style={{ color: '#9ca3af', textDecoration: 'none', fontSize: '0.9rem' }}>Política de Privacidade</Link>
+          <Link 
+            to="/termos" 
+            style={{ 
+              color: '#9ca3af', 
+              textDecoration: 'none', 
+              fontSize: windowWidth < 768 ? '0.75rem' : '0.9rem', 
+              marginRight: windowWidth < 768 ? '10px' : '15px' 
+            }}
+          >
+            Termos de Uso
+          </Link>
+          <Link 
+            to="/termos" 
+            style={{ 
+              color: '#9ca3af', 
+              textDecoration: 'none', 
+              fontSize: windowWidth < 768 ? '0.75rem' : '0.9rem' 
+            }}
+          >
+            Política de Privacidade
+          </Link>
         </div>
       </footer>
     </div>
