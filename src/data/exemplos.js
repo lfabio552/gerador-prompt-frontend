@@ -133,6 +133,135 @@ export const exemplosPorFerramenta = {
         feedback: "Ótimo trabalho! Sua argumentação é clara e você utilizou bons exemplos. Para atingir uma nota mais alta, sugiro: 1) Aprofundar a análise dos dados citados; 2) Apresentar um contra-argumento para fortalecer sua tese; 3) Detalhar melhor os agentes da sua proposta de intervenção."
       }
     }
+  ],
+
+  // ============================================
+  // 7. GERADOR DE IMAGEM (PROMPT)
+  // ============================================
+  'gerar-imagem': [
+    {
+      id: 1,
+      titulo: "🎨 Retrato Cinematográfico",
+      prompt: "Crie um prompt para um retrato cinematográfico de uma guerreira viking com cabelos ruços, cicatrizes de batalha, em uma floresta nevada ao amanhecer.",
+      imagem: "https://placehold.co/600x400/7e22ce/ffffff?text=Prompt+Cinematográfico",
+      resultado: "cinematic portrait of a fierce red-haired viking warrior with battle scars, standing in a snowy forest at dawn, dramatic lighting, photorealistic, 8k, highly detailed, art by Greg Rutkowski and Artgerm"
+    },
+    {
+      id: 2,
+      titulo: "🏙️ Cena Cyberpunk Urbana",
+      prompt: "Prompt para uma cena de rua cyberpunk à noite, com chuva, neons coloridos, hovercars voando e multidão com guarda-chuvas tecnológicos.",
+      imagem: "https://placehold.co/600x400/06b6d4/ffffff?text=Cyberpunk+Street",
+      resultado: "cyberpunk street scene at night with rain, colorful neon signs reflecting on wet asphalt, flying hovercars, crowded street with people holding high-tech umbrellas, cinematic lighting, Blade Runner style, wide shot, 8k"
+    }
+  ],
+
+  // ============================================
+  // 8. SIMULADOR DE ENTREVISTA
+  // ============================================
+  'simulador-entrevista': [
+    {
+      id: 1,
+      titulo: "💻 Vaga: Desenvolvedor Full-Stack Jr",
+      prompt: "Simule uma entrevista para desenvolvedor full-stack júnior em uma startup de fintech.",
+      imagem: null,
+      resultado: {
+        questions: [
+          {
+            q: "Conte-nos sobre algum projeto pessoal ou acadêmico onde você usou React e Node.js juntos.",
+            a: "Desenvolvi um sistema de gerenciamento de tarefas com frontend em React (hooks, context API) e backend em Node.js (Express, MongoDB). Implementei autenticação JWT e deploy no Render."
+          },
+          {
+            q: "Como você lida com prazos apertados quando encontra um bug crítico?",
+            a: "Primeiro priorizo: 1) Avalio o impacto do bug, 2) Comunico imediatamente ao time, 3) Busco a causa raiz antes de aplicar correções, 4) Documento a solução para evitar recorrência."
+          }
+        ],
+        tips: [
+          "Não fale mal de empregadores anteriores",
+          "Evite dizer 'não sei' - mostre como aprenderia",
+          "Tenha perguntas preparadas sobre a empresa"
+        ]
+      }
+    }
+  ],
+
+  // ============================================
+  // 9. GERADOR DE ESTUDOS
+  // ============================================
+  'gerador-estudos': [
+    {
+      id: 1,
+      titulo: "🧪 Quiz sobre Sistema Solar",
+      prompt: "Crie um quiz de 5 perguntas sobre o sistema solar para estudantes do ensino fundamental.",
+      imagem: "https://placehold.co/600x400/f59e0b/ffffff?text=Quiz+Sistema+Solar",
+      resultado: {
+        questions: [
+          {
+            question: "Qual é o maior planeta do sistema solar?",
+            options: ["A) Terra", "B) Júpiter", "C) Saturno", "D) Netuno"],
+            answer: "B",
+            explanation: "Júpiter é o maior planeta, com diâmetro de aproximadamente 139.820 km."
+          },
+          {
+            question: "Quantos planetas orbitam o Sol?",
+            options: ["A) 7", "B) 8", "C) 9", "D) 10"],
+            answer: "B",
+            explanation: "São 8 planetas: Mercúrio, Vênus, Terra, Marte, Júpiter, Saturno, Urano e Netuno."
+          }
+        ]
+      }
+    }
+  ],
+
+  // ============================================
+  // 10. CARTA DE APRESENTAÇÃO
+  // ============================================
+  'gerador-carta': [
+    {
+      id: 1,
+      titulo: "👨‍💼 Candidatura a Gerente de Projetos",
+      prompt: "CV: 8 anos em gerenciamento de projetos de TI, PMP certificado, experiência com metodologias ágeis. Vaga: Gerente de Projetos Sênior em consultoria internacional.",
+      imagem: null,
+      resultado: "Prezada equipe de seleção, minha trajetória de 8 anos em gerenciamento de projetos de TI, aliada à certificação PMP e expertise comprovada em metodologias ágeis, alinha-se perfeitamente aos desafios da posição de Gerente de Projetos Sênior em sua conceituada consultoria. Estou entusiasmado com a possibilidade de contribuir para projetos de escala internacional."
+    }
+  ],
+
+  // ============================================
+  // 11. VEO 3 PROMPT GENERATOR
+  // ============================================
+  'gerar-veo3-prompt': [
+    {
+      id: 1,
+      titulo: "🎬 Cena de Ação em Slow Motion",
+      prompt: "Cena: Herói pulando entre prédios em chuva. Estilo: Cinematográfico. Câmera: Slow motion 120fps. Iluminação: Neon refletido na chuva.",
+      imagem: "https://placehold.co/600x400/ef4444/ffffff?text=Cena+Ação+Veo",
+      resultado: "A dynamic superhero leaping between skyscrapers in heavy rain, slow motion 120fps, cinematic lighting with neon reflections on wet surfaces, dramatic camera angles, realistic physics, detailed rain droplets, epic soundtrack with synthwave elements"
+    }
+  ],
+
+  // ============================================
+  // 12. CHAT PDF
+  // ============================================
+  'chat-pdf': [
+    {
+      id: 1,
+      titulo: "📄 Contrato de Prestação de Serviços",
+      prompt: "Documento: Contrato de 15 páginas sobre prestação de serviços de desenvolvimento de software.",
+      imagem: "https://placehold.co/600x400/10b981/ffffff?text=Contrato+PDF",
+      resultado: "Após processar seu contrato, posso responder perguntas sobre: prazos de entrega, cláusulas de confidencialidade, termos de pagamento, direitos de propriedade intelectual e multas por atraso."
+    }
+  ],
+
+  // ============================================
+  // 13. RESUMIDOR DE TEXTOS
+  // ============================================
+  'resumir-texto': [
+    {
+      id: 1,
+      titulo: "📖 Resumo de Artigo Científico",
+      prompt: "Artigo de 10 páginas sobre os impactos da inteligência artificial no mercado de trabalho futuro.",
+      imagem: "https://placehold.co/600x400/8b5cf6/ffffff?text=Resumo+Artigo",
+      resultado: "O artigo analisa como a IA automatizará 30% das tarefas repetitivas até 2030, criando demanda por habilidades socioemocionais. Conclui que a requalificação profissional será crucial, sugerindo políticas públicas de educação continuada."
+    }
   ]
 };
 

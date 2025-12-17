@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import '../App.css';
 import { supabase } from '../supabaseClient';
+import ExemplosSection from '../components/ExemplosSection';
 
 export default function InterviewSimulator() {
   const [role, setRole] = useState('');
@@ -107,6 +108,8 @@ export default function InterviewSimulator() {
                     <div style={{ padding: '20px', color: '#d1d5db', lineHeight: '1.6' }}>
                         <span style={{ color: '#34d399', fontWeight: 'bold' }}>💡 Melhor Resposta: </span> 
                         {item.a}
+      <ExemplosSection ferramentaId="simulador-entrevista" />
+
                     </div>
                 </div>
             ))}

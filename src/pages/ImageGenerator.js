@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import '../App.css';
 import { supabase } from '../supabaseClient';
+import ExemplosSection from '../components/ExemplosSection';
 
 export default function ImageGenerator() {
   const [prompt, setPrompt] = useState('');
@@ -215,6 +216,8 @@ export default function ImageGenerator() {
                 >
                   📋 Copiar Link
                 </button>
+      <ExemplosSection ferramentaId="gerar-imagem-completa" />
+
               </div>
             </div>
           )}

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import '../App.css';
 import { supabase } from '../supabaseClient';
+import ExemplosSection from '../components/ExemplosSection';
 
 export default function StudyMaterialGenerator() {
   const [text, setText] = useState('');
@@ -193,6 +194,8 @@ export default function StudyMaterialGenerator() {
                                 padding: '20px', borderRadius: '12px', border: '2px solid #a855f7'
                             }}>
                                 <p style={{fontSize: '14px'}}>💡 {card.back}</p>
+      <ExemplosSection ferramentaId="gerador-estudos" />
+
                             </div>
                         </div>
                     </div>

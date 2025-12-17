@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import '../App.css'; 
 import { supabase } from '../supabaseClient';
+import ExemplosSection from '../components/ExemplosSection';
 
 export default function AgenteABNT() {
   const [rawText, setRawText] = useState('');
@@ -119,6 +120,8 @@ export default function AgenteABNT() {
           </button>
         </div>
       )}
-    </div>
+    
+      <ExemplosSection ferramentaId="agente-abnt" />
+</div>
   );
 }

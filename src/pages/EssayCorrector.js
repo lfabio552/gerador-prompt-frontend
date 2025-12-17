@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import '../App.css';
 import { supabase } from '../supabaseClient';
+import ExemplosSection from '../components/ExemplosSection';
 
 export default function EssayCorrector() {
   const [theme, setTheme] = useState('');
@@ -113,6 +114,8 @@ export default function EssayCorrector() {
             <div style={{ padding: '20px', backgroundColor: '#111827' }}>
                 <h3 style={{ color: '#facc15', marginBottom: '10px' }}>💡 Dicas de Melhoria:</h3>
                 <p style={{ color: '#d1d5db', lineHeight: '1.6' }}>{result.feedback}</p>
+      <ExemplosSection ferramentaId="corretor-redacao" />
+
             </div>
         </div>
       )}

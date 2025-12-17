@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import '../App.css';
 import { supabase } from '../supabaseClient';
+import ExemplosSection from '../components/ExemplosSection';
 
 export default function TextSummarizer() {
   const [text, setText] = useState('');
@@ -164,6 +165,8 @@ export default function TextSummarizer() {
             >
               🔄 Novo Texto
             </button>
+      <ExemplosSection ferramentaId="resumir-texto" />
+
           </div>
         </div>
       )}

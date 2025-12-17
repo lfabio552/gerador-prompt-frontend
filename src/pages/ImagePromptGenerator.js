@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import '../App.css';
 import { supabase } from '../supabaseClient'; // 1. Importamos o Supabase
+import ExemplosSection from '../components/ExemplosSection';
 
 export default function ImagePromptGenerator() {
   const [idea, setIdea] = useState('');
@@ -108,6 +109,8 @@ export default function ImagePromptGenerator() {
           <button onClick={handleCopy} className="copy-button">Copiar Prompt</button>
         </div>
       )}
-    </div>
+    
+      <ExemplosSection ferramentaId="gerar-imagem" />
+</div>
   );
 }

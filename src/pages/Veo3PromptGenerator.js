@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import '../App.css';
 import { supabase } from '../supabaseClient';
+import ExemplosSection from '../components/ExemplosSection';
 
 export default function Veo3PromptGenerator() {
   // Novo estado para o Modelo
@@ -155,6 +156,8 @@ export default function Veo3PromptGenerator() {
           <button onClick={() => navigator.clipboard.writeText(advancedPrompt)} className="copy-button">Copiar Prompt</button>
         </div>
       )}
-    </div>
+    
+      <ExemplosSection ferramentaId="gerar-veo3-prompt" />
+</div>
   );
 }

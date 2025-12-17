@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import '../App.css';
 import { supabase } from '../supabaseClient';
+import ExemplosSection from '../components/ExemplosSection';
 
 export default function CorporateTranslator() {
   const [rawText, setRawText] = useState('');
@@ -95,6 +96,8 @@ export default function CorporateTranslator() {
             </button>
           </div>
         )}
+      <ExemplosSection ferramentaId="tradutor-corporativo" />
+
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import '../App.css';
 import { supabase } from '../supabaseClient';
+import ExemplosSection from '../components/ExemplosSection';
 
 export default function ChatPDF() {
   const [file, setFile] = useState(null);
@@ -160,6 +161,8 @@ export default function ChatPDF() {
           </button>
         </div>
       )}
-    </div>
+    
+      <ExemplosSection ferramentaId="chat-pdf" />
+</div>
   );
 }

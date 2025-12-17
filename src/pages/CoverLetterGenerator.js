@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import '../App.css';
 import { supabase } from '../supabaseClient';
+import ExemplosSection from '../components/ExemplosSection';
 
 export default function CoverLetterGenerator() {
   const [cvText, setCvText] = useState('');
@@ -83,6 +84,8 @@ export default function CoverLetterGenerator() {
                 required
                 style={{ minHeight: '200px', width: '100%', padding: '15px', borderRadius: '8px', border: '1px solid #4b5563', backgroundColor: '#374151', color: 'white' }}
               />
+      <ExemplosSection ferramentaId="gerador-carta" />
+
             </div>
         </div>
 

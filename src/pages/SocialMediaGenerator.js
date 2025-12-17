@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import '../App.css';
 import { supabase } from '../supabaseClient';
+import ExemplosSection from '../components/ExemplosSection';
 
 export default function SocialMediaGenerator() {
   const [text, setText] = useState('');
@@ -95,6 +96,8 @@ export default function SocialMediaGenerator() {
             <h3 style={{ color: '#ffffff', marginBottom: '10px' }}>🐦 Twitter / X</h3>
             <p style={{ whiteSpace: 'pre-wrap', fontSize: '14px', color: '#e5e7eb', flexGrow: 1 }}>{results.twitter}</p>
             <button onClick={() => copyToClipboard(results.twitter)} className="copy-button" style={{ width: '100%', marginTop: '15px', fontSize: '12px', backgroundColor: '#333' }}>Copiar</button>
+      <ExemplosSection ferramentaId="social-media" />
+
           </div>
 
         </div>
