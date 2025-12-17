@@ -349,6 +349,17 @@ export default function HomePage() {
 	<Link to="/precos" style={{ color: '#9ca3af', textDecoration: 'none', marginRight: '15px' }}>
  	 Planos
 	</Link>
+
+{user && (
+  <Link 
+    to="/meu-historico" 
+    className="text-gray-400 hover:text-white transition-colors mr-4 text-sm font-medium flex items-center gap-2"
+  >
+    <ClockIcon className="h-4 w-4" />
+    Meu Histórico
+  </Link>
+)}
+
               {/* Botão PRO/Assinatura */}
               {!isPro ? (
                   <button 
