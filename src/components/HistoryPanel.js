@@ -2,70 +2,50 @@ import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
 import { 
   TrashIcon, 
-  ArrowDownTrayIcon, 
-  EyeIcon, 
-  EyeSlashIcon,
+  EyeIcon,
   ClockIcon,
-  DocumentTextIcon,
-  PhotoIcon,
-  TableCellsIcon,
-  ChatBubbleLeftRightIcon,
-  AcademicCapIcon,
-  BriefcaseIcon,
-  PuzzlePieceIcon
+  XMarkIcon,
+  ArrowsPointingOutIcon
 } from '@heroicons/react/24/solid';
 
-export default function HistoryPanel({ toolType = null, showHeader = true }) {
+export default function HistoryPanel({ toolType, isOpen = true, onClose = null }) {
   const [history, setHistory] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(null);
-  const [isPro, setIsPro] = useState(false);
-  const [showAll, setShowAll] = useState(false);
-  const [error, setError] = useState('');
+  const [expandedItem, setExpandedItem] = useState(null);
 
   useEffect(() => {
     const getUserData = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
       
-      if (user) {
-        // Verificar se é PRO
-        const { data } = await supabase
-          .from('profiles')
-          .select('is_pro')
-          .eq('id', user.id)
-          .single();
-        
-        setIsPro(data?.is_pro || false);
+      if (user && toolType) {
         loadHistory(user.id);
-      } else {
-        setLoading(false);
       }
     };
     
     getUserData();
-  }, []);
+  }, [toolType]);
 
   const loadHistory = async (userId) => {
+    setLoading(true);
     try {
-      const payload = { user_id: userId };
-      if (toolType) payload.tool_type = toolType;
-      
       const response = await fetch('https://meu-gerador-backend.onrender.com/get-history', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: JSON.stringify({ 
+          user_id: userId,
+          tool_type: toolType,
+          limit: 10
+        })
       });
       
       const data = await response.json();
       
       if (data.success) {
         setHistory(data.history);
-      } else {
-        setError(data.error || 'Erro ao carregar histórico');
       }
     } catch (error) {
-      setError('Erro de conexão com o servidor');
       console.error('Erro ao carregar histórico:', error);
     } finally {
       setLoading(false);
@@ -73,8 +53,7 @@ export default function HistoryPanel({ toolType = null, showHeader = true }) {
   };
 
   const deleteHistoryItem = async (itemId) => {
-    // CORREÇÃO AQUI: window.confirm em vez de confirm
-    if (!window.confirm('Tem certeza que deseja excluir este item do histórico?')) return;
+    if (!window.confirm('Excluir do histórico?')) return;
     
     try {
       const response = await fetch('https://meu-gerador-backend.onrender.com/delete-history-item', {
@@ -90,305 +69,230 @@ export default function HistoryPanel({ toolType = null, showHeader = true }) {
       
       if (data.success) {
         setHistory(prev => prev.filter(item => item.id !== itemId));
-        alert('✅ Item excluído com sucesso!');
-      } else {
-        alert('❌ Erro: ' + data.error);
       }
     } catch (error) {
-      alert('❌ Erro ao excluir item');
+      console.error('Erro ao excluir item:', error);
     }
   };
 
-  const saveToHistory = async (historyData) => {
-    try {
-      const response = await fetch('https://meu-gerador-backend.onrender.com/save-history', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(historyData)
-      });
-      
-      const data = await response.json();
-      return data.success;
-    } catch (error) {
-      console.error('Erro ao salvar histórico:', error);
-      return false;
-    }
+  const formatTime = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleTimeString('pt-BR', { 
+      hour: '2-digit', 
+      minute: '2-digit' 
+    });
   };
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
-    const now = new Date();
-    const diffMs = now - date;
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMs / 3600000);
-    const diffDays = Math.floor(diffMs / 86400000);
+    const today = new Date();
+    const diffTime = Math.abs(today - date);
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     
-    if (diffMins < 60) return `Há ${diffMins} min`;
-    if (diffHours < 24) return `Há ${diffHours} h`;
-    if (diffDays < 7) return `Há ${diffDays} dia(s)`;
+    if (diffDays === 0) return 'Hoje';
+    if (diffDays === 1) return 'Ontem';
+    if (diffDays < 7) return `${diffDays} dias atrás`;
     
-    return date.toLocaleDateString('pt-BR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
+    return date.toLocaleDateString('pt-BR', { 
+      day: 'numeric', 
+      month: 'short' 
     });
   };
 
-  const getToolIcon = (toolType) => {
+  const getToolIcon = () => {
     const icons = {
-      'image': <PhotoIcon className="h-5 w-5 text-purple-400" />,
-      'spreadsheet': <TableCellsIcon className="h-5 w-5 text-green-400" />,
-      'social': <ChatBubbleLeftRightIcon className="h-5 w-5 text-pink-400" />,
-      'abnt': <DocumentTextIcon className="h-5 w-5 text-blue-400" />,
-      'translation': <BriefcaseIcon className="h-5 w-5 text-yellow-400" />,
-      'essay': <AcademicCapIcon className="h-5 w-5 text-red-400" />,
-      'interview': <BriefcaseIcon className="h-5 w-5 text-indigo-400" />,
-      'study': <PuzzlePieceIcon className="h-5 w-5 text-teal-400" />,
-      'cover-letter': <DocumentTextIcon className="h-5 w-5 text-orange-400" />,
-      'video-prompt': <PhotoIcon className="h-5 w-5 text-cyan-400" />,
-      'text-summary': <DocumentTextIcon className="h-5 w-5 text-gray-400" />,
-      'chat-pdf': <DocumentTextIcon className="h-5 w-5 text-lime-400" />
+      'image': '🖼️',
+      'spreadsheet': '📊',
+      'social': '📱',
+      'abnt': '📝',
+      'translation': '👔',
+      'essay': '📚',
+      'interview': '💼',
+      'study': '🧠',
+      'cover-letter': '✉️',
+      'video-prompt': '🎬',
+      'text-summary': '📋',
+      'chat-pdf': '📄'
     };
-    return icons[toolType] || <DocumentTextIcon className="h-5 w-5 text-gray-400" />;
+    return icons[toolType] || '📝';
   };
 
-  const getToolColor = (toolType) => {
-    const colors = {
-      'image': 'bg-purple-900/30 border-purple-700',
-      'spreadsheet': 'bg-green-900/30 border-green-700',
-      'social': 'bg-pink-900/30 border-pink-700',
-      'abnt': 'bg-blue-900/30 border-blue-700',
-      'default': 'bg-gray-800 border-gray-700'
-    };
-    return colors[toolType] || colors.default;
+  const handleUseHistory = (inputData) => {
+    // Dispara evento customizado para a página principal usar
+    const event = new CustomEvent('useHistoryItem', { 
+      detail: { text: inputData } 
+    });
+    window.dispatchEvent(event);
+    
+    // Fecha o item expandido
+    setExpandedItem(null);
   };
 
-  // Usuários free só veem últimos 3 itens (a menos que sejam PRO)
-  const displayHistory = isPro || showAll ? history : history.slice(0, 3);
+  if (!isOpen || !toolType) return null;
 
   if (!user) {
     return (
-      <div className="mt-8 p-6 text-center bg-gray-800 rounded-xl border border-gray-700">
-        <p className="text-gray-400">Faça login para ver seu histórico de atividades</p>
-      </div>
-    );
-  }
-
-  if (loading) {
-    return (
-      <div className="mt-8 p-8 text-center bg-gray-800 rounded-xl border border-gray-700">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-purple-500 mx-auto"></div>
-        <p className="mt-4 text-gray-400">Carregando histórico...</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="mt-8 p-6 text-center bg-red-900/20 rounded-xl border border-red-700">
-        <p className="text-red-300">❌ {error}</p>
-        <button 
-          onClick={() => user && loadHistory(user.id)}
-          className="mt-3 px-4 py-2 bg-red-700 hover:bg-red-600 text-white rounded-lg text-sm"
-        >
-          Tentar novamente
-        </button>
-      </div>
-    );
-  }
-
-  if (history.length === 0) {
-    return (
-      <div className="mt-8 p-8 text-center bg-gray-800 rounded-xl border border-gray-700">
-        <div className="text-4xl mb-4">📭</div>
-        <p className="text-gray-300 font-medium">Nenhuma atividade registrada ainda</p>
-        <p className="text-gray-500 text-sm mt-2">
-          {toolType 
-            ? `Use a ferramenta "${toolType}" e seus resultados aparecerão aqui!`
-            : 'Use as ferramentas e seus resultados aparecerão aqui!'}
-        </p>
+      <div className="w-80 bg-gray-800 border-l border-gray-700 h-full overflow-y-auto">
+        <div className="p-4 text-center">
+          <p className="text-gray-400 text-sm">Faça login para ver histórico</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="mt-10 bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
+    <div className="w-80 bg-gray-800 border-l border-gray-700 h-full overflow-y-auto flex flex-col">
       {/* HEADER */}
-      {showHeader && (
-        <div className="px-6 py-4 bg-gray-900 border-b border-gray-700 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <ClockIcon className="h-5 w-5 text-purple-400" />
-            <h3 className="text-lg font-semibold text-white">
-              Histórico de Atividades
-              {toolType && (
-                <span className="ml-3 px-3 py-1 bg-purple-900 text-purple-300 text-xs font-medium rounded-full">
-                  {toolType === 'image' ? 'Imagens' : 
-                   toolType === 'spreadsheet' ? 'Planilhas' :
-                   toolType === 'social' ? 'Social Media' : 
-                   toolType.charAt(0).toUpperCase() + toolType.slice(1)}
-                </span>
-              )}
-            </h3>
-          </div>
-          
-          {!isPro && history.length > 3 && (
-            <button 
-              onClick={() => setShowAll(!showAll)}
-              className="flex items-center gap-2 px-4 py-2 bg-gray-700 hover:bg-gray-600 border border-gray-600 text-gray-300 rounded-lg text-sm font-medium transition-colors"
-            >
-              {showAll ? (
-                <>
-                  <EyeSlashIcon className="h-4 w-4" />
-                  Mostrar menos
-                </>
-              ) : (
-                <>
-                  <EyeIcon className="h-4 w-4" />
-                  Mostrar todos ({history.length})
-                </>
-              )}
-              {!isPro && <span className="text-yellow-400 text-xs">PRO</span>}
-            </button>
-          )}
+      <div className="p-4 border-b border-gray-700 flex justify-between items-center bg-gray-900">
+        <div className="flex items-center gap-2">
+          <ClockIcon className="h-5 w-5 text-purple-400" />
+          <h3 className="font-semibold text-white text-sm">
+            Histórico • {getToolIcon()} 
+            <span className="ml-2 text-gray-400">
+              {toolType === 'image' ? 'Imagens' :
+               toolType === 'spreadsheet' ? 'Planilhas' :
+               toolType === 'social' ? 'Social' :
+               toolType.charAt(0).toUpperCase() + toolType.slice(1)}
+            </span>
+          </h3>
         </div>
-      )}
-      
-      {/* LISTA DE ITENS */}
-      <div className="max-h-[500px] overflow-y-auto">
-        {displayHistory.map((item) => (
-          <div 
-            key={item.id} 
-            className={`p-5 border-b border-gray-700 hover:bg-gray-750 transition-colors ${getToolColor(item.tool_type)}`}
-          >
-            <div className="flex gap-4">
-              {/* ÍCONE */}
-              <div className="flex-shrink-0 pt-1">
-                <div className="p-2 bg-gray-900 rounded-lg border border-gray-700">
-                  {getToolIcon(item.tool_type)}
-                </div>
-              </div>
-              
-              {/* CONTEÚDO */}
-              <div className="flex-grow min-w-0">
-                <div className="flex justify-between items-start mb-3">
-                  <div>
-                    <h4 className="text-white font-semibold text-base mb-1">
-                      {item.tool_name}
-                    </h4>
-                    <div className="flex items-center gap-4 text-gray-400 text-xs">
-                      <span className="flex items-center gap-1">
-                        <ClockIcon className="h-3 w-3" />
-                        {formatDate(item.created_at)}
-                      </span>
-                      {item.metadata?.credits_used && (
-                        <span className="flex items-center gap-1">
-                          💎 {item.metadata.credits_used} crédito(s)
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  
-                  {/* AÇÕES */}
-                  <div className="flex gap-2">
-                    {item.output_data && item.tool_type === 'image' && (
-                      <button
-                        onClick={() => window.open(item.output_data, '_blank')}
-                        className="px-3 py-1.5 bg-blue-900 hover:bg-blue-800 border border-blue-700 text-blue-300 rounded-lg text-xs font-medium flex items-center gap-1 transition-colors"
-                        title="Ver imagem"
-                      >
-                        <EyeIcon className="h-3 w-3" />
-                        Ver
-                      </button>
-                    )}
-                    
-                    <button
-                      onClick={() => deleteHistoryItem(item.id)}
-                      className="px-3 py-1.5 bg-red-900/30 hover:bg-red-900/50 border border-red-700 text-red-300 rounded-lg text-xs font-medium flex items-center gap-1 transition-colors"
-                      title="Excluir do histórico"
-                    >
-                      <TrashIcon className="h-3 w-3" />
-                      Excluir
-                    </button>
-                  </div>
-                </div>
-                
-                {/* INPUT DO USUÁRIO */}
-                <div className="mb-3">
-                  <div className="text-gray-500 text-xs font-medium mb-1.5">ENTRADA:</div>
-                  <div className="p-3 bg-gray-900 rounded-lg border border-gray-700">
-                    <p className="text-gray-300 text-sm break-words">
-                      {item.input_data.length > 200 
-                        ? `${item.input_data.substring(0, 200)}...` 
-                        : item.input_data}
-                    </p>
-                  </div>
-                </div>
-                
-                {/* OUTPUT GERADO (se existir) */}
-                {item.output_data && (
-                  <div>
-                    <div className="text-green-500 text-xs font-medium mb-1.5">RESULTADO:</div>
-                    <div className="p-3 bg-gray-900 rounded-lg border border-gray-700">
-                      <div className="text-gray-300 text-sm break-words">
-                        {item.output_data.length > 250 
-                          ? `${item.output_data.substring(0, 250)}...` 
-                          : item.output_data}
-                      </div>
-                      {item.tool_type === 'spreadsheet' && (
-                        <button
-                          onClick={() => {
-                            // Simular download
-                            const a = document.createElement('a');
-                            a.href = '#';
-                            a.download = `backup_${item.id.slice(0, 8)}.xlsx`;
-                            a.click();
-                          }}
-                          className="mt-2 px-3 py-1 bg-green-900 hover:bg-green-800 text-green-300 rounded text-xs font-medium flex items-center gap-1 inline-flex"
-                        >
-                          <ArrowDownTrayIcon className="h-3 w-3" />
-                          Baixar novamente
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-      
-      {/* FOOTER - Upsell para PRO */}
-      {!isPro && history.length > 3 && (
-        <div className="p-5 bg-gradient-to-r from-purple-900/40 to-gray-900 border-t border-gray-700 text-center">
-          <p className="text-purple-300 font-medium mb-2">
-            👑 Acesso limitado ao histórico
-          </p>
-          <p className="text-gray-400 text-sm mb-4">
-            Usuários PRO veem histórico completo ilimitado + exportação em PDF
-          </p>
+        {onClose && (
           <button
-            onClick={() => window.location.href = '/precos'}
-            className="px-5 py-2.5 bg-gradient-to-r from-yellow-600 to-orange-600 hover:from-yellow-700 hover:to-orange-700 text-white font-semibold rounded-lg transition-all shadow-lg hover:shadow-yellow-500/20"
+            onClick={onClose}
+            className="p-1 hover:bg-gray-700 rounded text-gray-400 hover:text-white"
+            title="Fechar histórico"
           >
-            Ver Planos PRO
+            <XMarkIcon className="h-5 w-5" />
           </button>
+        )}
+      </div>
+
+      {/* LISTA */}
+      <div className="flex-1 overflow-y-auto">
+        {loading ? (
+          <div className="p-8 text-center">
+            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-purple-500 mx-auto"></div>
+            <p className="mt-3 text-gray-400 text-sm">Carregando...</p>
+          </div>
+        ) : history.length === 0 ? (
+          <div className="p-6 text-center">
+            <div className="text-3xl mb-2">📭</div>
+            <p className="text-gray-400 text-sm">Nenhuma atividade</p>
+            <p className="text-gray-500 text-xs mt-1">Use a ferramenta para começar</p>
+          </div>
+        ) : (
+          <div className="divide-y divide-gray-700">
+            {history.map((item, index) => {
+              const isExpanded = expandedItem === item.id;
+              const isToday = formatDate(item.created_at) === 'Hoje';
+              
+              return (
+                <div key={item.id} className="hover:bg-gray-750 transition-colors">
+                  {/* CABEÇALHO DO ITEM */}
+                  <div 
+                    className="p-3 cursor-pointer"
+                    onClick={() => setExpandedItem(isExpanded ? null : item.id)}
+                  >
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-xs text-gray-500 bg-gray-700 px-2 py-0.5 rounded">
+                            {isToday ? 'Hoje' : formatDate(item.created_at)}
+                          </span>
+                          <span className="text-xs text-gray-400">
+                            {formatTime(item.created_at)}
+                          </span>
+                        </div>
+                        <p className="text-gray-300 text-sm truncate">
+                          {item.input_data.length > 60 
+                            ? `${item.input_data.substring(0, 60)}...` 
+                            : item.input_data}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-1 ml-2">
+                        {!isExpanded && (
+                          <ArrowsPointingOutIcon className="h-4 w-4 text-gray-500" />
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* CONTEÚDO EXPANDIDO */}
+                  {isExpanded && (
+                    <div className="px-3 pb-3 border-t border-gray-700 pt-3">
+                      <div className="mb-3">
+                        <div className="text-gray-500 text-xs mb-1">Entrada:</div>
+                        <div className="bg-gray-900 p-3 rounded border border-gray-700">
+                          <p className="text-gray-300 text-sm whitespace-pre-wrap break-words">
+                            {item.input_data}
+                          </p>
+                        </div>
+                      </div>
+
+                      {item.output_data && (
+                        <div className="mb-3">
+                          <div className="text-green-500 text-xs mb-1">Resultado:</div>
+                          <div className="bg-gray-900 p-3 rounded border border-gray-700">
+                            <div className="text-gray-300 text-sm break-words">
+                              {item.output_data.length > 150 
+                                ? `${item.output_data.substring(0, 150)}...` 
+                                : item.output_data}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* AÇÕES */}
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleUseHistory(item.input_data)}
+                          className="flex-1 px-3 py-2 bg-purple-700 hover:bg-purple-600 text-white text-sm font-medium rounded transition-colors"
+                        >
+                          Usar Novamente
+                        </button>
+                        <button
+                          onClick={() => deleteHistoryItem(item.id)}
+                          className="px-3 py-2 bg-red-900/30 hover:bg-red-900/50 border border-red-700 text-red-300 text-sm font-medium rounded transition-colors"
+                          title="Excluir"
+                        >
+                          <TrashIcon className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* FOOTER */}
+      <div className="p-4 border-t border-gray-700 bg-gray-900">
+        <div className="text-center text-xs text-gray-500">
+          {history.length} itens no histórico
         </div>
-      )}
+        <button
+          onClick={() => loadHistory(user.id)}
+          className="w-full mt-2 px-3 py-2 bg-gray-700 hover:bg-gray-600 text-gray-300 text-sm font-medium rounded transition-colors"
+        >
+          ↻ Atualizar
+        </button>
+      </div>
     </div>
   );
 }
 
-// Exportar função auxiliar para outras páginas usarem
+// Função auxiliar para salvar histórico (usar nas ferramentas)
 export const saveHistoryItem = async (user, toolType, toolName, input, output = '', metadata = {}) => {
-  if (!user) return false;
+  if (!user || !toolType) return false;
   
   const historyData = {
     user_id: user.id,
     tool_type: toolType,
     tool_name: toolName,
-    input_data: input,
-    output_data: output,
+    input_data: input.substring(0, 1000),
+    output_data: output.substring(0, 2000),
     metadata: metadata
   };
   
