@@ -73,7 +73,8 @@ export default function HistoryPanel({ toolType = null, showHeader = true }) {
   };
 
   const deleteHistoryItem = async (itemId) => {
-    if (!confirm('Tem certeza que deseja excluir este item do histórico?')) return;
+    // CORREÇÃO AQUI: window.confirm em vez de confirm
+    if (!window.confirm('Tem certeza que deseja excluir este item do histórico?')) return;
     
     try {
       const response = await fetch('https://meu-gerador-backend.onrender.com/delete-history-item', {
