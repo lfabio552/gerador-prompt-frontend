@@ -29,6 +29,7 @@ import InterviewSimulator from './pages/InterviewSimulator';
 import StudyMaterialGenerator from './pages/StudyMaterialGenerator';
 import CoverLetterGenerator from './pages/CoverLetterGenerator';
 import TextSummarizer from './pages/TextSummarizer';
+import ImageGenerator from './pages/ImageGenerator';
 
 function App() {
   return (
@@ -62,6 +63,7 @@ function App() {
             <Route path="/gerador-estudos" element={<ProtectedRoute><StudyMaterialGenerator /></ProtectedRoute>} />
             <Route path="/gerador-carta" element={<ProtectedRoute><CoverLetterGenerator /></ProtectedRoute>} />
 	    <Route path="/resumir-texto" element={<ProtectedRoute><TextSummarizer /></ProtectedRoute>} />
+	    <Route path="/gerar-imagem-completa" element={<ProtectedRoute><ImageGenerator /></ProtectedRoute>} />
             
             {/* Rotas de placeholder */}
             <Route path="/chat" element={<div>Página de Chat em breve!</div>} />

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import '../App.css';
-import { supabase } from '../supabaseClient'; 
+import { supabase } from '../supabaseClient';
+import ExemplosSection from '../components/ExemplosSection';
 
 export default function SpreadsheetGenerator() {
   const [description, setDescription] = useState('');
@@ -93,6 +94,9 @@ export default function SpreadsheetGenerator() {
             <strong>Ops!</strong> {error}
         </div>
       )}
+
+{/* Seção de Exemplos */}
+<ExemplosSection ferramentaId="gerador-planilha" />
     </div>
   );
 }

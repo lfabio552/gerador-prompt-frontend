@@ -188,6 +188,13 @@ export default function HomePage() {
       imageUrl: "https://placehold.co/600x400/0d9488/ffffff?text=Resumo+IA", 
       link: "/resumir-texto" 
     },
+    { 
+      id: 14, 
+      title: "Gerador de Imagens", 
+      description: "Crie e gere imagens únicas com Stable Diffusion.", 
+      imageUrl: "https://placehold.co/600x400/8b5cf6/ffffff?text=Gerador+Imagem", 
+      link: "/gerar-imagem-completa" 
+     }
   ];
 
   const productivityTools = [
