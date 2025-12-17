@@ -1,10 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import Slider from 'react-slick';
-import { ChevronLeftIcon, ChevronRightIcon, UserCircleIcon, ArrowRightOnRectangleIcon, Cog6ToothIcon } from '@heroicons/react/24/solid';
+import { 
+  ChevronLeftIcon, 
+  ChevronRightIcon, 
+  UserCircleIcon, 
+  Cog6ToothIcon,
+  ClockIcon  // <-- NOVO: Ícone para histórico
+} from '@heroicons/react/24/solid';
 import { supabase } from '../supabaseClient'; 
 
-// --- SETAS DO CARROSSEL (Responsivas) ---
+// --- SETAS DO CARROSSEL ---
 function SampleNextArrow(props) {
   const { className, style, onClick } = props;
   return (
@@ -17,7 +23,7 @@ function SampleNextArrow(props) {
         borderRadius: '50%', 
         width: '40px', 
         height: '40px', 
-        right: window.innerWidth < 768 ? '-5px' : '-15px', // Ajustado para mobile
+        right: window.innerWidth < 768 ? '-5px' : '-15px',
         justifyContent: 'center', 
         alignItems: 'center', 
         zIndex: 50, 
@@ -41,7 +47,7 @@ function SamplePrevArrow(props) {
         borderRadius: '50%', 
         width: '40px', 
         height: '40px', 
-        left: window.innerWidth < 768 ? '-5px' : '-15px', // Ajustado para mobile
+        left: window.innerWidth < 768 ? '-5px' : '-15px',
         justifyContent: 'center', 
         alignItems: 'center', 
         zIndex: 50, 
@@ -189,12 +195,11 @@ export default function HomePage() {
       link: "/resumir-texto" 
     },
     { 
-      id: 14, 
-      title: "Gerador de Imagens", 
+      id: 14, title: "Gerador de Imagens", 
       description: "Crie e gere imagens únicas com Stable Diffusion.", 
       imageUrl: "https://placehold.co/600x400/8b5cf6/ffffff?text=Gerador+Imagem", 
       link: "/gerar-imagem-completa" 
-     }
+    },
   ];
 
   const productivityTools = [
@@ -332,35 +337,104 @@ export default function HomePage() {
       <div style={{ 
         padding: windowWidth < 768 ? '15px 10px' : '20px 20px', 
         display: 'flex', 
-        justifyContent: windowWidth < 768 ? 'center' : 'flex-end', 
+        justifyContent: windowWidth < 768 ? 'center' : 'space-between', 
         alignItems: 'center',
         flexWrap: 'wrap',
         gap: windowWidth < 768 ? '10px' : '15px'
       }}>
-          {user ? (
+        {/* LOGO / NOME DO SITE (ESQUERDA) */}
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: '10px',
+          marginRight: 'auto'
+        }}>
+          <Link to="/" style={{ 
+            textDecoration: 'none', 
+            color: '#fff', 
+            fontWeight: 'bold', 
+            fontSize: windowWidth < 768 ? '1.2rem' : '1.5rem',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px'
+          }}>
+            <span style={{ 
+              backgroundColor: '#7e22ce', 
+              width: '36px', 
+              height: '36px', 
+              borderRadius: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '20px'
+            }}>
+              ⚡
+            </span>
+            Adapta IA
+          </Link>
+          
+          {/* LINKS DE NAVEGAÇÃO (apenas desktop) */}
+          {windowWidth > 768 && (
             <div style={{ 
               display: 'flex', 
-              alignItems: 'center', 
-              gap: windowWidth < 768 ? '8px' : '15px',
-              flexWrap: windowWidth < 768 ? 'wrap' : 'nowrap',
-              justifyContent: windowWidth < 768 ? 'center' : 'flex-end',
-              width: '100%'
+              gap: '20px', 
+              marginLeft: '30px',
+              alignItems: 'center'
             }}>
-	<Link to="/precos" style={{ color: '#9ca3af', textDecoration: 'none', marginRight: '15px' }}>
- 	 Planos
-	</Link>
-
-{user && (
-  <Link 
-    to="/meu-historico" 
-    className="text-gray-400 hover:text-white transition-colors mr-4 text-sm font-medium flex items-center gap-2"
-  >
-    <ClockIcon className="h-4 w-4" />
-    Meu Histórico
-  </Link>
-)}
-
-              {/* Botão PRO/Assinatura */}
+              <Link to="/precos" style={{ 
+                color: '#9ca3af', 
+                textDecoration: 'none',
+                fontSize: '14px',
+                fontWeight: '500'
+              }}>
+                Planos
+              </Link>
+              <Link to="/termos" style={{ 
+                color: '#9ca3af', 
+                textDecoration: 'none',
+                fontSize: '14px',
+                fontWeight: '500'
+              }}>
+                Termos
+              </Link>
+            </div>
+          )}
+        </div>
+        
+        {/* PARTE DIREITA DO HEADER */}
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: windowWidth < 768 ? '8px' : '15px',
+          flexWrap: windowWidth < 768 ? 'wrap' : 'nowrap',
+          justifyContent: windowWidth < 768 ? 'center' : 'flex-end'
+        }}>
+          {/* BOTÃO HISTÓRICO (APENAS PARA USUÁRIOS LOGADOS) */}
+          {user && (
+            <Link 
+              to="/meu-historico" 
+              style={{ 
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                color: '#9ca3af', 
+                textDecoration: 'none',
+                fontSize: windowWidth < 768 ? '12px' : '14px',
+                padding: '8px 12px',
+                border: '1px solid #374151',
+                borderRadius: '8px',
+                backgroundColor: '#1f2937',
+                marginRight: '10px'
+              }}
+            >
+              <ClockIcon style={{ width: '16px', height: '16px' }} />
+              {windowWidth > 480 ? 'Histórico' : ''}
+            </Link>
+          )}
+          
+          {/* Botão PRO/Assinatura */}
+          {user ? (
+            <>
               {!isPro ? (
                   <button 
                     onClick={handleSubscribe} 
@@ -452,7 +526,7 @@ export default function HomePage() {
                   Sair
                 </button>
               </div>
-            </div>
+            </>
           ) : (
             <Link 
               to="/login" 
@@ -477,6 +551,7 @@ export default function HomePage() {
                 <UserCircleIcon style={{ width: '24px', height: '24px' }} />
             </Link>
           )}
+        </div>
       </div>
 
       {/* HERO SECTION RESPONSIVA */}
