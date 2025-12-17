@@ -14,6 +14,7 @@ import Login from './pages/Login';
 import ForgotPassword from './pages/ForgotPassword';
 import UpdatePassword from './pages/UpdatePassword';
 import TermsAndPrivacy from './pages/TermsAndPrivacy'; // <--- IMPORT NOVO
+import PricingPage from './pages/PricingPage';
 
 // Ferramentas
 import ImagePromptGenerator from './pages/ImagePromptGenerator';
@@ -44,6 +45,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/update-password" element={<UpdatePassword />} />
+	    <Route path="/precos" element={<PricingPage />} />
             
             {/* NOVA ROTA DE TERMOS */}
             <Route path="/termos" element={<TermsAndPrivacy />} />

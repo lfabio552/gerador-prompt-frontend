@@ -346,6 +346,9 @@ export default function HomePage() {
               justifyContent: windowWidth < 768 ? 'center' : 'flex-end',
               width: '100%'
             }}>
+	<Link to="/precos" style={{ color: '#9ca3af', textDecoration: 'none', marginRight: '15px' }}>
+ 	 Planos
+	</Link>
               {/* Botão PRO/Assinatura */}
               {!isPro ? (
                   <button 
