@@ -13,8 +13,18 @@ export default function AgenteABNT() {
   const [error, setError] = useState('');
   const [isDownloading, setIsDownloading] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  const [user, setUser] = useState(null); // ✅ Estado para o usuário
 
-  // ✅ CORRETO: useEffect no nível do componente
+  // ✅ Obter usuário ao carregar componente
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    };
+    getUser();
+  }, []);
+
+  // ✅ Ouvir eventos do histórico
   useEffect(() => {
     const handleLoadFromHistory = (event) => {
       if (event.detail && event.detail.text) {
@@ -40,15 +50,21 @@ export default function AgenteABNT() {
     setFormattedText('');
 
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Login necessário.');
+      // ✅ Agora user já está no estado, mas confirmamos
+      if (!user) {
+        const { data: { user: currentUser } } = await supabase.auth.getUser();
+        if (!currentUser) throw new Error('Login necessário.');
+        setUser(currentUser); // Atualiza estado se necessário
+      }
+
+      const currentUser = user; // Usar do estado
 
       const response = await fetch('https://meu-gerador-backend.onrender.com/format-abnt', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
             text: rawText,
-            user_id: user.id 
+            user_id: currentUser.id 
         }),
       });
 
@@ -62,7 +78,7 @@ export default function AgenteABNT() {
       // Salvar histórico
       try {
         const historySaved = await saveHistoryItem(
-          user,
+          currentUser,
           'abnt',
           'Formatador ABNT',
           rawText,
@@ -81,7 +97,6 @@ export default function AgenteABNT() {
         }
       } catch (historyError) {
         console.error('❌ Erro ao salvar histórico:', historyError);
-        // Não mostra erro para o usuário
       }
 
     } catch (err) {
@@ -134,26 +149,28 @@ export default function AgenteABNT() {
         <h1>Agente de Formatação ABNT 🎓</h1>
         <p>Cole seu trabalho abaixo e deixe a IA formatar para você.</p>
         
-        {/* BOTÃO PARA HISTÓRICO */}
-        <button
-          onClick={() => setShowHistory(!showHistory)}
-          style={{
-            marginTop: '10px',
-            padding: '8px 16px',
-            backgroundColor: showHistory ? '#7e22ce' : '#374151',
-            color: '#d1d5db',
-            border: '1px solid #4b5563',
-            borderRadius: '8px',
-            cursor: 'pointer',
-            fontSize: '14px',
-            transition: 'all 0.2s'
-          }}
-        >
-          {showHistory ? '▲ Ocultar Histórico' : '📚 Ver Meu Histórico ABNT'}
-        </button>
+        {/* ✅ Agora user está definido */}
+        {user && (
+          <button
+            onClick={() => setShowHistory(!showHistory)}
+            style={{
+              marginTop: '10px',
+              padding: '8px 16px',
+              backgroundColor: showHistory ? '#7e22ce' : '#374151',
+              color: '#d1d5db',
+              border: '1px solid #4b5563',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              fontSize: '14px',
+              transition: 'all 0.2s'
+            }}
+          >
+            {showHistory ? '▲ Ocultar Histórico' : '📚 Ver Meu Histórico ABNT'}
+          </button>
+        )}
       </header>
       
-      {/* SEÇÃO DO HISTÓRICO REAL */}
+      {/* ✅ Agora user está definido */}
       {showHistory && user && (
         <div style={{
           marginBottom: '30px',
