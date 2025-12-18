@@ -4,6 +4,7 @@ import { supabase } from '../supabaseClient';
 import ExemplosSection from '../components/ExemplosSection';
 // IMPORTANTE: Importar a função saveHistoryItem
 import { saveHistoryItem } from '../components/HistoryPanel';
+import HistoryList from '../components/HistoryList';
 
 export default function AgenteABNT() {
   const [rawText, setRawText] = useState('');
@@ -18,6 +19,27 @@ export default function AgenteABNT() {
     setIsLoading(true);
     setError('');
     setFormattedText('');
+
+// Ouvir evento para carregar texto do histórico
+useEffect(() => {
+  const handleLoadFromHistory = (event) => {
+    if (event.detail && event.detail.text) {
+      setRawText(event.detail.text);
+      setFormattedText('');
+      setError('');
+      // Fecha o histórico automaticamente
+      setShowHistory(false);
+      // Rola para o formulário
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+  
+  window.addEventListener('loadFromHistory', handleLoadFromHistory);
+  
+  return () => {
+    window.removeEventListener('loadFromHistory', handleLoadFromHistory);
+  };
+}, []);
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
