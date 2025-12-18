@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import '../App.css';
 import { supabase } from '../supabaseClient';
 import ExemplosSection from '../components/ExemplosSection';
+import config from '../config';
 
 export default function ImageGenerator() {
   // Estados principais
@@ -46,7 +47,7 @@ export default function ImageGenerator() {
       const fullPrompt = `${prompt}, ${styles[style]}, masterpiece, best quality`;
 
       // Chamar API
-      const response = await fetch('https://meu-gerador-backend.onrender.com/generate-image', {
+      const response = await fetch(config.ENDPOINTS.GENERATE_IMAGE, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
