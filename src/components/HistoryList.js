@@ -53,7 +53,6 @@ export default function HistoryList({ user, toolType }) {
     const responseText = await response.text();
     console.log('📥 Resposta bruta:', responseText);
 
-
   const formatDate = (dateString) => {
     try {
       const date = new Date(dateString);
