@@ -3,6 +3,8 @@ import '../App.css';
 import { supabase } from '../supabaseClient';
 import ExemplosSection from '../components/ExemplosSection';
 import config from '../config';
+import { saveToHistory, TOOL_CONFIGS } from '../utils/saveToHistory';
+import HistoryList from '../components/HistoryList';
 
 export default function ImageGenerator() {
   // Estados principais
@@ -12,6 +14,7 @@ export default function ImageGenerator() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [user, setUser] = useState(null);
+  const [showHistory, setShowHistory] = useState(false);
 
   // Estilos disponíveis
   const styles = {
@@ -62,6 +65,20 @@ export default function ImageGenerator() {
       if (!response.ok) throw new Error(data.error || 'Erro ao gerar imagem.');
 
       setImageUrl(data.image_url);
+
+      // SALVAR HISTÓRICO
+      await saveToHistory(
+        user,
+        TOOL_CONFIGS.IMAGE_GENERATE,
+        fullPrompt,
+        data.image_url,
+        { 
+          style: style,
+          prompt_length: fullPrompt.length,
+          image_url: data.image_url,
+          credits_used: 2
+        }
+      );
 
     } catch (err) {
       setError(err.message);
@@ -133,7 +150,40 @@ export default function ImageGenerator() {
             <span style={{ color: '#9ca3af' }}>•</span>
             <span style={{ color: '#9ca3af' }}>Stable Diffusion SDXL</span>
           </div>
+          
+          {/* Botão de histórico */}
+          {user && (
+            <button
+              onClick={() => setShowHistory(!showHistory)}
+              style={{
+                marginTop: '20px',
+                padding: '8px 16px',
+                backgroundColor: showHistory ? '#7e22ce' : '#374151',
+                color: '#d1d5db',
+                border: '1px solid #4b5563',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '14px',
+                transition: 'all 0.2s'
+              }}
+            >
+              {showHistory ? '▲ Ocultar Histórico' : '📚 Ver Meu Histórico'}
+            </button>
+          )}
         </div>
+        
+        {/* Seção de histórico */}
+        {showHistory && user && (
+          <div style={{
+            marginBottom: '30px',
+            padding: '20px',
+            backgroundColor: '#1f2937',
+            borderRadius: '10px',
+            border: '1px solid #374151'
+          }}>
+            <HistoryList user={user} toolType="image" />
+          </div>
+        )}
         
         {/* FORMULÁRIO E CONTEÚDO */}
         <div style={{ 

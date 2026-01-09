@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../App.css';
-import { supabase } from '../supabaseClient'; // 1. Importamos o Supabase
+import { supabase } from '../supabaseClient';
 import ExemplosSection from '../components/ExemplosSection';
+import { saveToHistory, TOOL_CONFIGS } from '../utils/saveToHistory';
+import HistoryList from '../components/HistoryList';
 
 export default function ImagePromptGenerator() {
   const [idea, setIdea] = useState('');
@@ -9,6 +11,17 @@ export default function ImagePromptGenerator() {
   const [advancedPrompt, setAdvancedPrompt] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [user, setUser] = useState(null);
+  const [showHistory, setShowHistory] = useState(false);
+
+  // Carregar usuário ao montar
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    };
+    getUser();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -17,38 +30,40 @@ export default function ImagePromptGenerator() {
     setAdvancedPrompt('');
 
     try {
-      // 2. Pegamos o usuário logado
       const { data: { user } } = await supabase.auth.getUser();
       
       if (!user) throw new Error('Você precisa estar logado.');
+      setUser(user);
 
       const response = await fetch('https://meu-gerador-backend.onrender.com/generate-prompt', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           idea, 
           style,
-          user_id: user.id // 3. Enviamos o ID junto com o pedido
+          user_id: user.id
         }),
       });
 
       const data = await response.json();
 
-      // 4. Se o backend disser "Erro 402" (Pagamento), mostramos o erro de crédito
-      if (response.status === 402) {
-        throw new Error(data.error); // "Você não tem créditos suficientes..."
-      }
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Falha na comunicação com o servidor.');
-      }
+      if (response.status === 402) throw new Error(data.error);
+      if (!response.ok) throw new Error(data.error || 'Falha na comunicação com o servidor.');
 
       setAdvancedPrompt(data.advanced_prompt);
 
-      // (Opcional) Recarrega a página ou atualiza o contador de créditos no cabeçalho
-      // window.location.reload(); // Se quiser atualizar o saldo na hora (bruto, mas funciona)
+      // SALVAR HISTÓRICO
+      await saveToHistory(
+        user,
+        TOOL_CONFIGS.IMAGE_PROMPT,
+        `Ideia: ${idea}\nEstilo: ${style}`,
+        data.advanced_prompt,
+        { 
+          style: style,
+          idea_length: idea.length,
+          prompt_length: data.advanced_prompt.length 
+        }
+      );
 
     } catch (err) {
       setError(err.message);
@@ -67,7 +82,40 @@ export default function ImagePromptGenerator() {
       <header>
         <h1>Gerador de Prompt Avançado</h1>
         <p>Transforme suas ideias simples em prompts perfeitos para IA.</p>
+        
+        {/* Botão de histórico */}
+        {user && (
+          <button
+            onClick={() => setShowHistory(!showHistory)}
+            style={{
+              marginTop: '10px',
+              padding: '8px 16px',
+              backgroundColor: showHistory ? '#7e22ce' : '#374151',
+              color: '#d1d5db',
+              border: '1px solid #4b5563',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              fontSize: '14px',
+              transition: 'all 0.2s'
+            }}
+          >
+            {showHistory ? '▲ Ocultar Histórico' : '📚 Ver Meu Histórico'}
+          </button>
+        )}
       </header>
+      
+      {/* Seção de histórico */}
+      {showHistory && user && (
+        <div style={{
+          marginBottom: '30px',
+          padding: '20px',
+          backgroundColor: '#1f2937',
+          borderRadius: '10px',
+          border: '1px solid #374151'
+        }}>
+          <HistoryList user={user} toolType="image" />
+        </div>
+      )}
       
       <form onSubmit={handleSubmit}>
         <div className="form-group">
@@ -111,6 +159,6 @@ export default function ImagePromptGenerator() {
       )}
     
       <ExemplosSection ferramentaId="gerar-imagem" />
-</div>
+    </div>
   );
 }
