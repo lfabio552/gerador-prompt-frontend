@@ -133,7 +133,8 @@ export default function HistoryList({ user, toolType }) {
     }
   };
 
-  const useItemAgain = (inputData) => {
+  // CORREÇÃO AQUI: Renomeado de useItemAgain para handleUseItemAgain
+  const handleUseItemAgain = (inputData) => {
     // Dispara evento para o AgenteABNT usar este texto
     const event = new CustomEvent('loadFromHistory', { 
       detail: { text: inputData } 
@@ -363,8 +364,9 @@ export default function HistoryList({ user, toolType }) {
                   📋 Copiar
                 </button>
                 
+                {/* CORREÇÃO AQUI: handleUseItemAgain em vez de useItemAgain */}
                 <button
-                  onClick={() => useItemAgain(item.input_data)}
+                  onClick={() => handleUseItemAgain(item.input_data)}
                   style={{
                     padding: '6px 12px',
                     backgroundColor: '#10b981',
