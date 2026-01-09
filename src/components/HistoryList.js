@@ -19,68 +19,40 @@ export default function HistoryList({ user, toolType }) {
   }, [user, toolType, forceReload]);
 
   const loadHistory = async () => {
-    console.log('📡 Carregando histórico...');
-    
-    if (!user || !user.id) {
-      console.error('❌ Usuário não autenticado');
-      setError('Usuário não autenticado');
-      setLoading(false);
-      return;
-    }
+  console.log('🔍 Iniciando loadHistory...');
+  console.log('👤 Usuário:', user?.id);
+  console.log('🛠️  Tool type:', toolType);
+  
+  if (!user || !user.id) {
+    console.error('❌ Usuário não autenticado');
+    setError('Usuário não autenticado');
+    setLoading(false);
+    return;
+  }
 
-    setLoading(true);
-    setError('');
+  setLoading(true);
+  setError('');
+  
+  try {
+    const requestBody = { 
+      user_id: user.id,
+      tool_type: toolType,
+      limit: 10
+    };
     
-    try {
-      console.log('📤 Fazendo request para API...');
-      
-      const requestBody = { 
-        user_id: user.id,
-        tool_type: toolType,
-        limit: 10
-      };
-      
-      console.log('📦 Request Body:', requestBody);
-      
-      const response = await fetch('https://meu-gerador-backend.onrender.com/get-history', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody)
-      });
-      
-      console.log('📥 Status da resposta:', response.status);
-      
-      // Primeiro tentamos ler como texto para debug
-      const responseText = await response.text();
-      console.log('📥 Resposta bruta:', responseText.substring(0, 200) + '...');
-      
-      let data;
-      try {
-        data = JSON.parse(responseText);
-      } catch (parseError) {
-        console.error('❌ Erro ao parsear JSON:', parseError);
-        setError('Resposta inválida do servidor');
-        return;
-      }
-      
-      console.log('📊 Dados parseados:', data);
-      
-      if (data.success) {
-        console.log(`✅ Sucesso! ${data.history?.length || 0} itens carregados`);
-        setHistory(data.history || []);
-      } else {
-        console.error('❌ Erro do servidor:', data.error);
-        setError(data.error || 'Erro ao carregar histórico');
-      }
-      
-    } catch (err) {
-      console.error('💥 Erro completo:', err);
-      setError('Falha na conexão com o servidor: ' + err.message);
-    } finally {
-      setLoading(false);
-      console.log('🏁 Carregamento finalizado');
-    }
-  };
+    console.log('📤 Request Body:', requestBody);
+    
+    const response = await fetch('https://meu-gerador-backend.onrender.com/get-history', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(requestBody)
+    });
+    
+    console.log('📥 Status:', response.status);
+    
+    const responseText = await response.text();
+    console.log('📥 Resposta bruta:', responseText);
+
 
   const formatDate = (dateString) => {
     try {
