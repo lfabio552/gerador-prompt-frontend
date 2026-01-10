@@ -35,6 +35,22 @@ export default function ImageGenerator() {
     getUser();
   }, []);
 
+  // --- NOVO: Ouvinte do Histórico (Faz o botão "Usar" funcionar) ---
+  useEffect(() => {
+    const handleLoadFromHistory = (event) => {
+      if (event.detail && event.detail.text) {
+        setPrompt(event.detail.text); // Preenche o campo de prompt
+        setShowHistory(false); // Fecha o painel de histórico
+        window.scrollTo({ top: 0, behavior: 'smooth' }); // Sobe a tela
+      }
+    };
+
+    window.addEventListener('loadFromHistory', handleLoadFromHistory);
+    return () => {
+      window.removeEventListener('loadFromHistory', handleLoadFromHistory);
+    };
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -89,7 +105,6 @@ export default function ImageGenerator() {
 
   const downloadImage = async () => {
     if (!imageUrl) return;
-    
     try {
       const response = await fetch(imageUrl);
       const blob = await response.blob();

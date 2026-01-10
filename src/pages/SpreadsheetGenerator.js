@@ -1,20 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import '../App.css';
 import { supabase } from '../supabaseClient';
-import ExemplosSection from '../components/ExemplosSection';
+import config from '../config';
 import { saveToHistory, TOOL_CONFIGS } from '../utils/saveToHistory';
 import HistoryList from '../components/HistoryList';
+import ExemplosSection from '../components/ExemplosSection';
 
 export default function SpreadsheetGenerator() {
   const [description, setDescription] = useState('');
+  const [fileUrl, setFileUrl] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isDownloading, setIsDownloading] = useState(false);
   const [error, setError] = useState('');
   const [user, setUser] = useState(null);
   const [showHistory, setShowHistory] = useState(false);
-  const [generatedInfo, setGeneratedInfo] = useState(null);
 
-  // Carregar usuário ao montar
   useEffect(() => {
     const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -23,63 +21,53 @@ export default function SpreadsheetGenerator() {
     getUser();
   }, []);
 
-  const handleSubmit = async (e) => {
+  // --- NOVO: Ouvinte do Histórico ---
+  useEffect(() => {
+    const handleLoadFromHistory = (event) => {
+      if (event.detail && event.detail.text) {
+        setDescription(event.detail.text); // Preenche a descrição
+        setShowHistory(false);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    };
+
+    window.addEventListener('loadFromHistory', handleLoadFromHistory);
+    return () => {
+      window.removeEventListener('loadFromHistory', handleLoadFromHistory);
+    };
+  }, []);
+
+  const handleGenerate = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError('');
-    setGeneratedInfo(null);
+    setFileUrl('');
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Faça login para gerar planilhas.');
-      setUser(user);
+      if (!user) throw new Error('Faça login para continuar.');
 
-      const response = await fetch('https://meu-gerador-backend.onrender.com/generate-spreadsheet', {
+      const response = await fetch(config.ENDPOINTS.GENERATE_SPREADSHEET, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          description: description,
-          user_id: user.id 
+        body: JSON.stringify({
+          description,
+          user_id: user.id
         }),
       });
 
-      const blob = await response.blob();
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Erro ao gerar planilha.');
 
-      if (response.status === 402) {
-        const errorData = await response.json();
-        throw new Error(errorData.error);
-      }
-      
-      if (!response.ok) {
-        throw new Error('Erro ao gerar planilha.');
-      }
+      setFileUrl(data.file_url);
 
-      // Criar URL para download
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `planilha_ia_${Date.now()}.xlsx`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      window.URL.revokeObjectURL(url);
-
-      setGeneratedInfo({
-        filename: a.download,
-        size: `${(blob.size / 1024).toFixed(1)} KB`,
-        description: description
-      });
-
-      // SALVAR HISTÓRICO
+      // Salvar histórico
       await saveToHistory(
         user,
         TOOL_CONFIGS.SPREADSHEET,
         description,
-        `Planilha gerada: ${a.download}`,
-        { 
-          file_size: `${(blob.size / 1024).toFixed(1)} KB`,
-          format: 'Excel (.xlsx)'
-        }
+        'Planilha Excel Gerada',
+        { file_url: data.file_url }
       );
 
     } catch (err) {
@@ -89,352 +77,128 @@ export default function SpreadsheetGenerator() {
     }
   };
 
-  const handleDownload = async () => {
-    if (!generatedInfo) return;
-    
-    setIsDownloading(true);
-    try {
-      // Re-gera a planilha para download
-      const response = await fetch('https://meu-gerador-backend.onrender.com/generate-spreadsheet', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-          description: description,
-          user_id: user?.id 
-        }),
-      });
-
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `planilha_ia_${Date.now()}.xlsx`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      window.URL.revokeObjectURL(url);
-    } catch (err) {
-      setError('Erro ao baixar novamente: ' + err.message);
-    } finally {
-      setIsDownloading(false);
-    }
-  };
-
-  const clearFields = () => {
-    setDescription('');
-    setError('');
-    setGeneratedInfo(null);
-  };
-
   return (
-    <div className="container">
-      <header>
-        <h1>Gerador de Planilhas 📊</h1>
-        <p>Descreva o que precisa e receba um arquivo Excel pronto.</p>
+    <div style={{ minHeight: '100vh', backgroundColor: '#111827', color: 'white', padding: '20px' }}>
+      <div style={{ maxWidth: '800px', margin: '0 auto' }}>
         
-        {/* Botão de histórico */}
-        {user && (
-          <button
-            onClick={() => setShowHistory(!showHistory)}
-            style={{
-              marginTop: '10px',
-              padding: '8px 16px',
-              backgroundColor: showHistory ? '#7e22ce' : '#374151',
-              color: '#d1d5db',
-              border: '1px solid #4b5563',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              fontSize: '14px',
-              transition: 'all 0.2s'
-            }}
-          >
-            {showHistory ? '▲ Ocultar Histórico' : '📚 Ver Meu Histórico'}
-          </button>
-        )}
-      </header>
-      
-      {/* Seção de histórico */}
-      {showHistory && user && (
-        <div style={{
-          marginBottom: '30px',
-          padding: '20px',
-          backgroundColor: '#1f2937',
-          borderRadius: '10px',
-          border: '1px solid #374151'
-        }}>
-          <HistoryList user={user} toolType="spreadsheet" />
-        </div>
-      )}
-      
-      <div style={{ width: '100%' }}>
-        <form onSubmit={handleSubmit}>
-          <div className="form-group" style={{ textAlign: 'left' }}>
-            <label>Descreva sua planilha (seja específico):</label>
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Ex: Planilha de controle financeiro mensal com colunas para data, descrição, categoria (alimentação, transporte, lazer), valor e saldo acumulado. Inclua fórmulas para soma automática e gráfico de pizza das categorias."
-              required
-              style={{ 
-                minHeight: '150px',
-                width: '95%',
-                padding: '15px',
-                borderRadius: '8px',
-                border: '1px solid #4b5563',
-                backgroundColor: '#374151',
-                color: 'white',
-                fontFamily: 'sans-serif',
-                fontSize: '16px'
-              }}
-            />
-            <div style={{ 
-              marginTop: '10px',
-              color: '#9ca3af',
-              fontSize: '14px'
-            }}>
-              💡 <strong>Dicas para melhores resultados:</strong>
-              <ul style={{ margin: '5px 0 0 20px', padding: 0 }}>
-                <li>Mencione as colunas necessárias</li>
-                <li>Descreva fórmulas ou cálculos</li>
-                <li>Fale sobre formatação desejada</li>
-                <li>Inclua exemplos de dados</li>
-              </ul>
-            </div>
-          </div>
+        <h1 style={{ textAlign: 'center', fontSize: '2.5rem', marginBottom: '10px' }}>
+          📊 Gerador de Planilhas Excel
+        </h1>
+        <p style={{ textAlign: 'center', color: '#9ca3af', marginBottom: '30px' }}>
+          Descreva o que você precisa e a IA cria o arquivo Excel pronto para baixar.
+        </p>
 
-          <div style={{ display: 'flex', gap: '15px', justifyContent: 'center', marginTop: '30px' }}>
-            <button 
-              type="submit" 
-              disabled={isLoading}
+        {/* Botão Histórico */}
+        {user && (
+          <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+            <button
+              onClick={() => setShowHistory(!showHistory)}
               style={{
-                padding: '15px 30px',
-                backgroundColor: isLoading ? '#4c1d95' : '#7e22ce',
-                color: 'white',
-                border: 'none',
-                borderRadius: '8px',
-                fontSize: '16px',
-                fontWeight: 'bold',
-                cursor: isLoading ? 'not-allowed' : 'pointer',
-                opacity: isLoading ? 0.8 : 1,
-                minWidth: '200px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '10px'
-              }}
-            >
-              {isLoading ? (
-                <>
-                  <div style={{ 
-                    width: '20px', 
-                    height: '20px', 
-                    border: '2px solid white',
-                    borderTop: '2px solid transparent',
-                    borderRadius: '50%',
-                    animation: 'spin 1s linear infinite'
-                  }}></div>
-                  Gerando (-1 Crédito)...
-                </>
-              ) : '📊 Gerar Planilha Excel'}
-            </button>
-            
-            <button 
-              type="button"
-              onClick={clearFields}
-              style={{
-                padding: '15px 20px',
-                backgroundColor: '#374151',
+                padding: '8px 16px',
+                backgroundColor: showHistory ? '#7e22ce' : '#374151',
                 color: '#d1d5db',
                 border: '1px solid #4b5563',
                 borderRadius: '8px',
-                fontSize: '14px',
                 cursor: 'pointer'
               }}
             >
-              🗑️ Limpar
+              {showHistory ? '▲ Ocultar Histórico' : '📚 Ver Histórico'}
             </button>
           </div>
-          
-          <style>{`
-            @keyframes spin {
-              0% { transform: rotate(0deg); }
-              100% { transform: rotate(360deg); }
-            }
-          `}</style>
-        </form>
+        )}
 
-        {error && (
-          <div className="error-message" style={{
-            color: '#ff6b6b', 
-            marginTop: '20px',
-            padding: '15px',
-            backgroundColor: '#450a0a',
-            borderRadius: '8px',
-            border: '1px solid #dc2626'
-          }}>
-            <strong>⚠️ Erro:</strong> {error}
+        {/* Lista Histórico */}
+        {showHistory && user && (
+          <div style={{ marginBottom: '30px', padding: '20px', backgroundColor: '#1f2937', borderRadius: '10px' }}>
+            <HistoryList user={user} toolType="spreadsheet" />
           </div>
         )}
 
-        {generatedInfo && (
-          <div className="result-container" style={{
-            textAlign: 'left', 
-            marginTop: '40px',
-            padding: '25px',
-            backgroundColor: '#064e3b',
-            borderRadius: '12px',
-            border: '1px solid #047857'
-          }}>
-            <div style={{ 
-              display: 'flex', 
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              marginBottom: '20px'
-            }}>
-              <h2 style={{ color: '#4ade80', margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
-                ✅ Planilha Gerada com Sucesso!
-              </h2>
-              <div style={{ 
-                backgroundColor: '#065f46',
-                color: '#d1fae5',
-                padding: '5px 15px',
-                borderRadius: '20px',
-                fontSize: '14px',
-                fontWeight: 'bold',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}>
-                <span>📁</span> {generatedInfo.size}
-              </div>
-            </div>
-            
-            <div style={{ 
-              backgroundColor: '#111827',
-              padding: '20px',
-              borderRadius: '10px',
-              marginBottom: '25px',
-              border: '1px solid #374151'
-            }}>
-              <h3 style={{ color: '#d1d5db', marginBottom: '10px', fontSize: '16px' }}>
-                📝 Descrição usada:
-              </h3>
-              <p style={{ color: '#9ca3af', margin: 0, lineHeight: '1.5' }}>
-                {generatedInfo.description}
-              </p>
-            </div>
-            
-            <div style={{ 
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-              gap: '15px',
-              marginBottom: '25px'
-            }}>
-              <div style={{ 
-                backgroundColor: '#111827',
-                padding: '15px',
-                borderRadius: '8px',
-                textAlign: 'center'
-              }}>
-                <div style={{ color: '#9ca3af', fontSize: '14px', marginBottom: '5px' }}>Formato</div>
-                <div style={{ color: '#fff', fontSize: '16px', fontWeight: 'bold' }}>Excel (.xlsx)</div>
-              </div>
-              
-              <div style={{ 
-                backgroundColor: '#111827',
-                padding: '15px',
-                borderRadius: '8px',
-                textAlign: 'center'
-              }}>
-                <div style={{ color: '#9ca3af', fontSize: '14px', marginBottom: '5px' }}>Tamanho</div>
-                <div style={{ color: '#fff', fontSize: '16px', fontWeight: 'bold' }}>{generatedInfo.size}</div>
-              </div>
-              
-              <div style={{ 
-                backgroundColor: '#111827',
-                padding: '15px',
-                borderRadius: '8px',
-                textAlign: 'center'
-              }}>
-                <div style={{ color: '#9ca3af', fontSize: '14px', marginBottom: '5px' }}>Contém</div>
-                <div style={{ color: '#fff', fontSize: '16px', fontWeight: 'bold' }}>Fórmulas</div>
-              </div>
-            </div>
-            
-            <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
-              <button 
-                onClick={handleDownload}
-                disabled={isDownloading}
+        <div style={{ backgroundColor: '#1f2937', padding: '30px', borderRadius: '12px', border: '1px solid #374151' }}>
+          <form onSubmit={handleGenerate}>
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'block', marginBottom: '10px' }}>
+                O que essa planilha deve conter?
+              </label>
+              <textarea
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder="Ex: Uma planilha de controle financeiro pessoal com colunas para data, descrição, categoria, valor entrada e valor saída, com fórmulas de saldo..."
+                required
                 style={{
-                  padding: '12px 25px',
-                  backgroundColor: isDownloading ? '#059669' : '#10b981',
-                  color: 'white',
-                  border: 'none',
+                  width: '100%',
+                  height: '150px',
+                  padding: '15px',
                   borderRadius: '8px',
-                  cursor: isDownloading ? 'not-allowed' : 'pointer',
-                  fontWeight: 'bold',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '10px',
-                  minWidth: '180px'
-                }}
-              >
-                {isDownloading ? (
-                  <>
-                    <div style={{ 
-                      width: '18px', 
-                      height: '18px', 
-                      border: '2px solid white',
-                      borderTop: '2px solid transparent',
-                      borderRadius: '50%',
-                      animation: 'spin 1s linear infinite'
-                    }}></div>
-                    Baixando...
-                  </>
-                ) : '⬇️ Baixar Novamente'}
-              </button>
-              
-              <button 
-                onClick={() => navigator.clipboard.writeText(description)}
-                style={{
-                  padding: '12px 25px',
-                  backgroundColor: '#3b82f6',
+                  backgroundColor: '#111827',
                   color: 'white',
-                  border: 'none',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  fontWeight: 'bold',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '10px'
-                }}
-              >
-                📋 Copiar Descrição
-              </button>
-              
-              <button 
-                onClick={clearFields}
-                style={{
-                  padding: '12px 25px',
-                  backgroundColor: '#374151',
-                  color: '#d1d5db',
                   border: '1px solid #4b5563',
-                  borderRadius: '8px',
-                  cursor: 'pointer',
-                  fontWeight: 'bold',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '10px'
+                  fontSize: '16px'
                 }}
-              >
-                🗑️ Criar Nova
-              </button>
+              />
             </div>
+
+            <button
+              type="submit"
+              disabled={isLoading}
+              style={{
+                width: '100%',
+                padding: '15px',
+                background: 'linear-gradient(90deg, #059669 0%, #10b981 100%)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '8px',
+                fontWeight: 'bold',
+                cursor: isLoading ? 'wait' : 'pointer',
+                opacity: isLoading ? 0.7 : 1,
+                fontSize: '1.1rem'
+              }}
+            >
+              {isLoading ? 'Criando Arquivo...' : '📥 Gerar Excel (.xlsx)'}
+            </button>
+          </form>
+
+          {error && (
+            <div style={{ marginTop: '20px', color: '#fca5a5', padding: '10px', backgroundColor: '#450a0a', borderRadius: '8px' }}>
+              {error}
+            </div>
+          )}
+        </div>
+
+        {fileUrl && (
+          <div style={{ 
+            marginTop: '30px', 
+            backgroundColor: '#1f2937', 
+            padding: '30px', 
+            borderRadius: '12px', 
+            border: '1px solid #059669',
+            textAlign: 'center'
+          }}>
+            <h3 style={{ marginBottom: '15px', color: '#34d399' }}>✅ Planilha Criada com Sucesso!</h3>
+            <p style={{ color: '#d1d5db', marginBottom: '25px' }}>Seu arquivo está pronto para download.</p>
+            
+            <a 
+              href={fileUrl} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              style={{
+                display: 'inline-block',
+                padding: '15px 30px',
+                backgroundColor: '#059669',
+                color: 'white',
+                textDecoration: 'none',
+                borderRadius: '8px',
+                fontWeight: 'bold',
+                fontSize: '1.1rem'
+              }}
+            >
+              ⬇️ Baixar Arquivo Excel
+            </a>
           </div>
         )}
+
+        <ExemplosSection ferramentaId="planilhas" />
       </div>
-      
-      <ExemplosSection ferramentaId="gerador-planilha" />
     </div>
   );
 }

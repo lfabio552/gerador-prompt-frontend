@@ -1,168 +1,240 @@
-import React, { useState } from 'react';
-import '../App.css';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
+import config from '../config';
+import { saveToHistory, TOOL_CONFIGS } from '../utils/saveToHistory';
+import HistoryList from '../components/HistoryList';
 import ExemplosSection from '../components/ExemplosSection';
 
 export default function ChatPDF() {
-  const [file, setFile] = useState(null);
-  const [uploading, setUploading] = useState(false);
-  const [documentId, setDocumentId] = useState(null); // ID do doc atual
-  
   const [question, setQuestion] = useState('');
-  const [chatHistory, setChatHistory] = useState([]); // Histórico da conversa
-  const [asking, setAsking] = useState(false);
+  const [file, setFile] = useState(null);
+  const [answer, setAnswer] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [user, setUser] = useState(null);
+  const [showHistory, setShowHistory] = useState(false);
 
-  // --- FUNÇÃO DE UPLOAD ---
-  const handleUpload = async (e) => {
-    e.preventDefault();
-    if (!file) return alert("Selecione um arquivo!");
-    
-    setUploading(true);
-    try {
+  useEffect(() => {
+    const getUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) throw new Error('Faça login primeiro.');
+      setUser(user);
+    };
+    getUser();
+  }, []);
 
-      const formData = new FormData();
-      formData.append('file', file);
-      formData.append('user_id', user.id);
+  // --- OUVINTE DO HISTÓRICO ---
+  useEffect(() => {
+    const handleLoadFromHistory = (event) => {
+      if (event.detail && event.detail.text) {
+        setQuestion(event.detail.text); // Preenche a pergunta
+        setShowHistory(false);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        // Nota: Não podemos restaurar o arquivo PDF por segurança do navegador
+      }
+    };
 
-      // ATENÇÃO: Mude para o link do Render no deploy!
-      const response = await fetch('https://meu-gerador-backend.onrender.com/upload-document', {
-        method: 'POST',
-        body: formData, 
-        // Não colocamos Content-Type aqui, o navegador define automatico para multipart/form-data
-      });
+    window.addEventListener('loadFromHistory', handleLoadFromHistory);
+    return () => {
+      window.removeEventListener('loadFromHistory', handleLoadFromHistory);
+    };
+  }, []);
 
-      const data = await response.json();
-      
-      if (response.status === 402) throw new Error(data.error);
-      if (!response.ok) throw new Error(data.error || 'Erro no upload.');
-
-      setDocumentId(data.document_id);
-      alert("Documento processado! Pode perguntar.");
-
-    } catch (error) {
-      alert(error.message);
-    } finally {
-      setUploading(false);
+  const handleFileChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setFile(e.target.files[0]);
     }
   };
 
-  // --- FUNÇÃO DE PERGUNTAR ---
-  const handleAsk = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!question) return;
-
-    const userQuestion = question;
-    setChatHistory(prev => [...prev, { role: 'user', content: userQuestion }]);
-    setQuestion('');
-    setAsking(true);
+    setIsLoading(true);
+    setError('');
+    setAnswer('');
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('Faça login para continuar.');
       
-      const response = await fetch('https://meu-gerador-backend.onrender.com/ask-document', {
+      if (!file && !question) {
+        throw new Error('Por favor, envie um PDF ou faça uma pergunta.');
+      }
+
+      const formData = new FormData();
+      formData.append('question', question);
+      if (file) {
+        formData.append('file', file);
+      }
+      formData.append('user_id', user.id);
+
+      // Nota: Certifique-se que o endpoint no app.py aceita POST multipart/form-data
+      const response = await fetch(config.ENDPOINTS.CHAT_PDF || 'http://localhost:5000/chat-pdf', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          question: userQuestion,
-          user_id: user.id,
-          document_id: documentId // Opcional, ajuda a filtrar se quiser
-        }),
+        body: formData, // Não usamos headers Content-Type aqui, o browser define automatico para multipart
       });
 
       const data = await response.json();
-      
-      if (response.status === 402) throw new Error(data.error);
-      if (!response.ok) throw new Error(data.error || 'Erro na resposta.');
+      if (!response.ok) throw new Error(data.error || 'Erro ao processar PDF.');
 
-      setChatHistory(prev => [...prev, { role: 'ai', content: data.answer }]);
+      setAnswer(data.answer);
 
-    } catch (error) {
-      setChatHistory(prev => [...prev, { role: 'ai', content: "Erro: " + error.message }]);
+      // Salvar no Histórico
+      await saveToHistory(
+        user,
+        TOOL_CONFIGS.CHAT_PDF || { type: 'chat-pdf', name: 'Chat com PDF', credits: 1 },
+        question, // Pergunta como prompt
+        data.answer,
+        { file_name: file ? file.name : 'Arquivo anterior' }
+      );
+
+    } catch (err) {
+      setError(err.message);
     } finally {
-      setAsking(false);
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="container">
-      <header>
-        <h1>Chat com PDF (RAG) 🧠</h1>
-        <p>Converse com seus contratos, apostilas ou livros.</p>
-      </header>
+    <div style={{ minHeight: '100vh', backgroundColor: '#111827', color: 'white', padding: '20px' }}>
+      <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+        
+        <h1 style={{ textAlign: 'center', fontSize: '2.5rem', marginBottom: '10px' }}>
+          📑 Chat com PDF Inteligente
+        </h1>
+        <p style={{ textAlign: 'center', color: '#9ca3af', marginBottom: '30px' }}>
+          Envie documentos e tire dúvidas sobre o conteúdo instantaneamente.
+        </p>
 
-      {/* FASE 1: UPLOAD (Só mostra se não tiver processado ainda) */}
-      {!documentId && (
-        <form onSubmit={handleUpload} style={{ marginBottom: '40px' }}>
-          <div className="form-group" style={{ textAlign: 'center', border: '2px dashed #3A3A3A', padding: '40px', borderRadius: '10px' }}>
-            <input 
-              type="file" 
-              accept=".pdf"
-              onChange={(e) => setFile(e.target.files[0])}
-              style={{ display: 'none' }}
-              id="file-upload"
-            />
-            <label htmlFor="file-upload" style={{ cursor: 'pointer', color: '#9D4EDD', fontWeight: 'bold', fontSize: '18px' }}>
-              {file ? file.name : "📂 Clique para selecionar um PDF"}
-            </label>
-          </div>
-          <button type="submit" disabled={uploading}>
-            {uploading ? 'Lendo e vetorizando (-1 Crédito)...' : 'Processar Documento'}
-          </button>
-        </form>
-      )}
-
-      {/* FASE 2: CHAT (Mostra depois do upload) */}
-      {documentId && (
-        <div className="chat-interface" style={{ textAlign: 'left' }}>
-          
-          <div className="chat-box" style={{ 
-            height: '400px', overflowY: 'auto', backgroundColor: '#1f2937', 
-            padding: '20px', borderRadius: '10px', marginBottom: '20px', border: '1px solid #374151' 
-          }}>
-            {chatHistory.length === 0 && <p style={{color: '#6b7280', textAlign: 'center'}}>Pergunte algo sobre o documento...</p>}
-            
-            {chatHistory.map((msg, index) => (
-              <div key={index} style={{ 
-                marginBottom: '15px', 
-                textAlign: msg.role === 'user' ? 'right' : 'left' 
-              }}>
-                <span style={{ 
-                  display: 'inline-block',
-                  padding: '10px 15px', 
-                  borderRadius: '10px',
-                  backgroundColor: msg.role === 'user' ? '#7e22ce' : '#374151',
-                  color: 'white',
-                  maxWidth: '80%'
-                }}>
-                  {msg.content}
-                </span>
-              </div>
-            ))}
-            {asking && <p style={{color: '#9ca3af'}}>A IA está lendo...</p>}
-          </div>
-
-          <form onSubmit={handleAsk} style={{ display: 'flex', gap: '10px' }}>
-            <input 
-              type="text" 
-              value={question}
-              onChange={(e) => setQuestion(e.target.value)}
-              placeholder="Qual é o prazo do contrato?"
-              style={{ flex: 1, padding: '15px', borderRadius: '8px', border: 'none', backgroundColor: '#374151', color: 'white' }}
-            />
-            <button type="submit" disabled={asking} style={{ width: '100px', marginTop: 0 }}>
-              Enviar
+        {/* Botão Histórico */}
+        {user && (
+          <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+            <button
+              onClick={() => setShowHistory(!showHistory)}
+              style={{
+                padding: '8px 16px',
+                backgroundColor: showHistory ? '#7e22ce' : '#374151',
+                color: '#d1d5db',
+                border: '1px solid #4b5563',
+                borderRadius: '8px',
+                cursor: 'pointer'
+              }}
+            >
+              {showHistory ? '▲ Ocultar Histórico' : '📚 Ver Histórico de Perguntas'}
             </button>
-          </form>
+          </div>
+        )}
+
+        {/* Lista Histórico */}
+        {showHistory && user && (
+          <div style={{ marginBottom: '30px', padding: '20px', backgroundColor: '#1f2937', borderRadius: '10px' }}>
+            <HistoryList user={user} toolType="chat-pdf" />
+          </div>
+        )}
+
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '30px' }}>
           
-          <button onClick={() => setDocumentId(null)} style={{ marginTop: '20px', backgroundColor: 'transparent', border: '1px solid #6b7280', fontSize: '12px', padding: '5px 10px' }}>
-            Carregar outro arquivo
-          </button>
+          {/* Área de Upload e Pergunta */}
+          <div style={{ backgroundColor: '#1f2937', padding: '30px', borderRadius: '12px', border: '1px solid #374151' }}>
+            <form onSubmit={handleSubmit}>
+              
+              {/* Upload de Arquivo */}
+              <div style={{ marginBottom: '25px', padding: '20px', border: '2px dashed #4b5563', borderRadius: '8px', textAlign: 'center' }}>
+                <label style={{ display: 'block', marginBottom: '10px', color: '#d1d5db', cursor: 'pointer' }}>
+                  📂 {file ? file.name : 'Clique para selecionar seu PDF'}
+                </label>
+                <input
+                  type="file"
+                  accept=".pdf"
+                  onChange={handleFileChange}
+                  style={{ display: 'none' }}
+                  id="pdf-upload"
+                />
+                <button
+                  type="button"
+                  onClick={() => document.getElementById('pdf-upload').click()}
+                  style={{
+                    padding: '8px 16px',
+                    backgroundColor: '#374151',
+                    color: 'white',
+                    border: '1px solid #4b5563',
+                    borderRadius: '6px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Selecionar Arquivo
+                </button>
+              </div>
+
+              {/* Campo de Pergunta */}
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ display: 'block', marginBottom: '10px', fontSize: '1.1rem' }}>
+                  Sua Pergunta:
+                </label>
+                <textarea
+                  value={question}
+                  onChange={(e) => setQuestion(e.target.value)}
+                  placeholder="Ex: Qual é a conclusão principal deste documento? O que ele diz sobre prazos?"
+                  required
+                  style={{
+                    width: '100%',
+                    height: '100px',
+                    padding: '15px',
+                    borderRadius: '8px',
+                    backgroundColor: '#111827',
+                    color: 'white',
+                    border: '1px solid #4b5563',
+                    fontSize: '16px'
+                  }}
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={isLoading}
+                style={{
+                  width: '100%',
+                  padding: '15px',
+                  background: 'linear-gradient(90deg, #ef4444 0%, #b91c1c 100%)',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontWeight: 'bold',
+                  fontSize: '1.1rem',
+                  cursor: isLoading ? 'wait' : 'pointer',
+                  opacity: isLoading ? 0.7 : 1
+                }}
+              >
+                {isLoading ? 'Lendo PDF e Analisando...' : '🚀 Enviar Pergunta'}
+              </button>
+            </form>
+
+            {error && (
+              <div style={{ marginTop: '20px', color: '#fca5a5', padding: '10px', backgroundColor: '#450a0a', borderRadius: '8px' }}>
+                {error}
+              </div>
+            )}
+          </div>
+
+          {/* Área de Resposta */}
+          {answer && (
+            <div style={{ backgroundColor: '#1f2937', padding: '30px', borderRadius: '12px', border: '1px solid #374151' }}>
+              <h3 style={{ marginBottom: '20px', color: '#fff' }}>🤖 Resposta da IA:</h3>
+              <div style={{ 
+                whiteSpace: 'pre-wrap', 
+                color: '#d1d5db', 
+                lineHeight: '1.6', 
+                fontSize: '1.05rem',
+                backgroundColor: '#111827',
+                padding: '20px',
+                borderRadius: '8px'
+              }}>
+                {answer}
+              </div>
+            </div>
+          )}
         </div>
-      )}
-    
-      <ExemplosSection ferramentaId="chat-pdf" />
-</div>
+
+        <ExemplosSection ferramentaId="chat-pdf" />
+      </div>
+    </div>
   );
 }
