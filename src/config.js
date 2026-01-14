@@ -2,16 +2,10 @@
 
 /**
  * CONFIGURAÇÕES CENTRALIZADAS DO ADAPTA IA
- * 
- * Como usar:
- * 1. Importe: import config from './config';
- * 2. Use: fetch(config.ENDPOINTS.GENERATE_IMAGE, ...)
- * 
- * Variáveis de ambiente no Vercel:
- * REACT_APP_API_URL=https://meu-gerador-backend.onrender.com
  */
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://meu-gerador-backend.onrender.com';
+// Se estiver rodando local, usa localhost. Se for produção, usa a URL do Render.
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'https://meuappprompt-backend.onrender.com';
 
 // Configurações principais
 const CONFIG = {
@@ -20,72 +14,68 @@ const CONFIG = {
   
   // Nome do projeto
   APP_NAME: 'Adapta IA',
-  APP_VERSION: '1.0.0',
   
-  // URLs de redirecionamento
-  FRONTEND_URL: process.env.REACT_APP_FRONTEND_URL || 'https://gerador-prompt-frontend-rc35.vercel.app',
-  
-  // Supabase (já configurado no supabaseClient.js, mas mantemos referência)
-  SUPABASE: {
-    URL: process.env.REACT_APP_SUPABASE_URL || 'https://orxwfidvidpuksdfgeip.supabase.co',
-    ANON_KEY: process.env.REACT_APP_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9yeHdmaWR2aWRwdWtzZGZnZWlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjM0OTAzNzEsImV4cCI6MjA3OTA2NjM3MX0.GllkQAAIGFNWNq9NPbvZq-9uNA2pBCjOyKD21hcM0wg'
-  },
-  
-  // Todos os endpoints da API
+  // Endpoints da API (Rotas do Backend)
   ENDPOINTS: {
-    // Autenticação & Usuário
+    // --- Autenticação & Usuário ---
     CREATE_CHECKOUT_SESSION: `${API_BASE_URL}/create-checkout-session`,
     CREATE_PORTAL_SESSION: `${API_BASE_URL}/create-portal-session`,
     WEBHOOK: `${API_BASE_URL}/webhook`,
     
-    // Histórico
+    // --- Histórico ---
     SAVE_HISTORY: `${API_BASE_URL}/save-history`,
     GET_HISTORY: `${API_BASE_URL}/get-history`,
     DELETE_HISTORY_ITEM: `${API_BASE_URL}/delete-history-item`,
     
-    // Ferramentas de Imagem
+    // --- Ferramentas de Imagem ---
     GENERATE_IMAGE: `${API_BASE_URL}/generate-image`,
-    GENERATE_PROMPT: `${API_BASE_URL}/generate-prompt`,
-    GENERATE_VEO3_PROMPT: `${API_BASE_URL}/generate-veo3-prompt`,
     
-    // Ferramentas de Texto
+    // CORREÇÃO AQUI: Adicionados os dois nomes para garantir compatibilidade
+    GENERATE_PROMPT: `${API_BASE_URL}/generate-prompt`,       // Nome antigo
+    GENERATE_IMAGE_PROMPT: `${API_BASE_URL}/generate-prompt`, // Nome novo (usado na atualização)
+    
+    GENERATE_VEO3_PROMPT: `${API_BASE_URL}/generate-veo3-prompt`,
+    GENERATE_VIDEO_PROMPT: `${API_BASE_URL}/generate-veo3-prompt`, // Alias para o novo código
+    
+    // --- Ferramentas de Texto ---
     SUMMARIZE_TEXT: `${API_BASE_URL}/summarize-text`,
     SUMMARIZE_VIDEO: `${API_BASE_URL}/summarize-video`,
     FORMAT_ABNT: `${API_BASE_URL}/format-abnt`,
     DOWNLOAD_DOCX: `${API_BASE_URL}/download-docx`,
+    
     CORPORATE_TRANSLATOR: `${API_BASE_URL}/corporate-translator`,
+    TRANSLATE_CORPORATE: `${API_BASE_URL}/corporate-translator`, // Alias para o novo código
+    
     GENERATE_COVER_LETTER: `${API_BASE_URL}/generate-cover-letter`,
     
-    // Ferramentas de Produtividade
+    // --- Ferramentas de Produtividade ---
     GENERATE_SPREADSHEET: `${API_BASE_URL}/generate-spreadsheet`,
     GENERATE_SOCIAL_MEDIA: `${API_BASE_URL}/generate-social-media`,
     
-    // Ferramentas Educacionais
+    // --- Ferramentas Educacionais ---
     CORRECT_ESSAY: `${API_BASE_URL}/correct-essay`,
+    
     MOCK_INTERVIEW: `${API_BASE_URL}/mock-interview`,
+    INTERVIEW_SIMULATOR: `${API_BASE_URL}/mock-interview`, // Alias para o novo código
+    
     GENERATE_STUDY_MATERIAL: `${API_BASE_URL}/generate-study-material`,
     
-    // RAG (PDF)
+    // --- RAG (PDF) ---
     UPLOAD_DOCUMENT: `${API_BASE_URL}/upload-document`,
-    ASK_DOCUMENT: `${API_BASE_URL}/ask-document`
+    ASK_DOCUMENT: `${API_BASE_URL}/ask-document`,
+    CHAT_PDF: `${API_BASE_URL}/ask-document` // Alias
   },
   
   // Limites e configurações das ferramentas
   LIMITS: {
-    // TextSummarizer
     MAX_TEXT_LENGTH: 15000,
     MIN_TEXT_LENGTH: 50,
-    
-    // ImageGenerator
     MAX_PROMPT_LENGTH: 500,
     MIN_PROMPT_LENGTH: 10,
-    
-    // General
     MAX_UPLOAD_SIZE: 10 * 1024 * 1024, // 10MB
-    REQUEST_TIMEOUT: 30000 // 30 segundos
   },
   
-  // Créditos por ferramenta
+  // Créditos por ferramenta (Para exibição no front)
   CREDITS_PER_TOOL: {
     IMAGE_GENERATOR: 2,
     IMAGE_PROMPT: 1,
@@ -101,21 +91,16 @@ const CONFIG = {
     STUDY_MATERIAL: 1,
     COVER_LETTER: 1,
     UPLOAD_DOCUMENT: 1,
-    ASK_DOCUMENT: 0 // Primeira pergunta gratuita após upload
+    ASK_DOCUMENT: 0 
   },
   
   // Preços e planos
   PRICING: {
     PRO_MONTHLY: 19.99,
-    PRO_YEARLY: 199.99,
-    CREDITS_PACK: {
-      10: 9.99,
-      50: 39.99,
-      100: 69.99
-    }
+    PRO_YEARLY: 199.99
   },
   
-  // Configurações de UI
+  // Cores da UI
   UI: {
     THEME: 'dark',
     PRIMARY_COLOR: '#7e22ce',
@@ -123,14 +108,7 @@ const CONFIG = {
     SUCCESS_COLOR: '#10b981',
     ERROR_COLOR: '#ef4444',
     WARNING_COLOR: '#f59e0b'
-  },
-  
-  // Modo de desenvolvimento
-  IS_DEVELOPMENT: process.env.NODE_ENV === 'development',
-  IS_PRODUCTION: process.env.NODE_ENV === 'production',
-  
-  // Logging
-  LOG_LEVEL: process.env.REACT_APP_LOG_LEVEL || 'warn'
+  }
 };
 
 // Funções utilitárias
@@ -159,16 +137,13 @@ export const validateTextLength = (text, tool) => {
   }
   
   if (text.length > maxLength) {
-    return { 
-      valid: false, 
-      message: `Texto muito longo. Máximo ${maxLength} caracteres.` 
-    };
+    return { valid: false, message: `Texto muito longo. Máximo ${maxLength} caracteres.` };
   }
   
   return { valid: true, message: '' };
 };
 
-// Versão simplificada para import rápido
+// Exports para facilitar importação
 export const API = CONFIG.ENDPOINTS;
 export const LIMITS = CONFIG.LIMITS;
 export const CREDITS = CONFIG.CREDITS_PER_TOOL;
