@@ -21,7 +21,6 @@ export default function Veo3PromptGenerator() {
     getUser();
   }, []);
 
-  // --- OUVINTE DO HISTÓRICO ---
   useEffect(() => {
     const handleLoadFromHistory = (event) => {
       if (event.detail && event.detail.text) {
@@ -47,7 +46,6 @@ export default function Veo3PromptGenerator() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) throw new Error('Faça login para continuar.');
 
-      // CORREÇÃO: Use a URL do seu config.js corretamente
       const endpoint = config.ENDPOINTS?.GENERATE_VIDEO_PROMPT || 
                       `${config.BACKEND_URL || 'https://meuappprompt-backend.onrender.com'}/generate-veo3-prompt`;
       
@@ -86,7 +84,6 @@ export default function Veo3PromptGenerator() {
 
       setGeneratedPrompt(data.prompt || data.advanced_prompt);
 
-      // Salvar no Histórico
       await saveToHistory(
         user,
         TOOL_CONFIGS.VEO3_PROMPT,
@@ -114,7 +111,6 @@ export default function Veo3PromptGenerator() {
           Gere descrições cinematográficas para Sora, Runway e Google Veo.
         </p>
 
-        {/* Exibir erro */}
         {error && (
           <div style={{
             backgroundColor: '#7f1d1d',
@@ -140,7 +136,6 @@ export default function Veo3PromptGenerator() {
           </div>
         )}
 
-        {/* Botão Histórico */}
         {user && (
           <div style={{ textAlign: 'center', marginBottom: '20px' }}>
             <button
@@ -159,19 +154,17 @@ export default function Veo3PromptGenerator() {
           </div>
         )}
 
-        {/* Lista Histórico */}
         {showHistory && user && (
           <div style={{ marginBottom: '30px', padding: '20px', backgroundColor: '#1f2937', borderRadius: '10px' }}>
             <HistoryList user={user} toolType="video-prompt" />
           </div>
         )}
 
-        {/* FORMULÁRIO PRINCIPAL - CORRIGIDO */}
         <div style={{ 
           backgroundColor: '#1f2937', 
           padding: '30px', 
           borderRadius: '12px', 
-          border: '1px solid #374151' // CORREÇÃO AQUI: string completa
+          border: '1px solid #374151'
         }}>
           <form onSubmit={handleGenerate}>
             <div style={{ marginBottom: '20px' }}>
@@ -188,7 +181,7 @@ export default function Veo3PromptGenerator() {
                   borderRadius: '8px',
                   backgroundColor: '#111827',
                   color: 'white',
-                  border: '1px solid #4b5563' // CORREÇÃO AQUI
+                  border: '1px solid #4b5563'
                 }}
               />
             </div>
@@ -220,7 +213,7 @@ export default function Veo3PromptGenerator() {
               backgroundColor: '#111827', 
               padding: '20px', 
               borderRadius: '8px', 
-              border: '1px solid #8b5cf6' // CORREÇÃO AQUI
+              border: '1px solid #8b5cf6'
             }}>
               <h3 style={{ color: '#ddd6fe', marginBottom: '10px' }}>Prompt Cinematográfico:</h3>
               <p style={{ 
